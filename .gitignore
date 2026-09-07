@@ -1,0 +1,19 @@
+# Secrets and local tooling config
+.mcp.json
+
+# Run state: the log is history and is committed; everything else is regenerable
+.witnessed/*
+!.witnessed/runs.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+
+# macOS
+.DS_Store

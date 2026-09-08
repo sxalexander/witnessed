@@ -31,9 +31,29 @@ two languages.
 
 ## The grid
 
-Write `docs.grid.yaml` **beside the thing it describes**, not in a
-subdirectory. A verifier runs in the manifest's own directory, so a manifest
-at the project root sees the project's paths.
+```
+witnessed init \
+  --id=docs \
+  --claim="Every guide exists in every supported language" \
+  --dimensions=install,usage,api \
+  --variants=en,es \
+  --verify='test -f docs/{variant}/{dimension}.md && echo "{\"ok\": true}" || echo "{\"ok\": false}"'
+```
+
+```
+docs.grid.yaml
+
+6 cells, none witnessed. Run: witnessed verify docs.grid.yaml
+```
+
+Every field is a flag, so the command is scriptable and there is nothing to
+fill in afterwards. Omit `--verify` and a runnable stub is written to
+`verify/<id>` alongside the manifest, so a grid runs before its verifier is
+written and every cell is honestly red.
+
+The manifest lands **beside the thing it describes**. A verifier runs in the
+manifest's own directory, so a manifest at the project root sees the project's
+paths.
 
 ```yaml
 witnessed: 1
@@ -43,19 +63,24 @@ claim: "Every guide exists in every supported language"
 dimensions: [install, usage, api]
 variants:   [en, es]
 
-verify: "test -f docs/{variant}/{dimension}.md && echo '{\"ok\": true}' || echo '{\"ok\": false}'"
+verify: "test -f docs/{variant}/{dimension}.md && echo \"{\\\"ok\\\": true}\" || echo \"{\\\"ok\\\": false}\""
 
 policy:
   on_gap: report
   on_regression: fail
 ```
 
-Six cells, and nothing says which are true. There is no field for that. A
-cell is witnessed when the verifier says so.
+Six cells, and nothing says which are true. There is no field for that, and
+`init` has no flag for it: a cell is witnessed when a verifier says so, and a
+cell is excepted by reacting to a run rather than before one.
 
 The verifier is any command that prints one JSON object on its last line.
 This one is a shell test; yours might be a script that reads an asset
 database, a graph, or an API.
+
+`--stdout` prints the manifest instead of writing it, `--path` puts it
+somewhere other than the working directory, and `--on-gap=fail` makes the grid
+an acceptance gate rather than a roadmap.
 
 ## The first run
 

@@ -29,7 +29,11 @@ from pathlib import Path
 
 import pytest
 
-from witnessed import manifest, state
+from pydantic import ValidationError
+
+from witnessed import manifest
+from witnessed import manifest as manifest_module
+from witnessed import state
 from witnessed.model import Grid, is_gap
 from witnessed.render import GridView, build_view
 from witnessed.runner import DEFAULT_CONCURRENCY, DEFAULT_TIMEOUT
@@ -225,6 +229,131 @@ def _gap(arguments: argparse.Namespace) -> int:
     return int(pytest.ExitCode.OK)
 
 
+STUB_VERIFIER = """#!/usr/bin/env python3
+\"\"\"Answer one cell of the {id} grid.
+
+Receives a dimension and a variant, and prints one JSON object on its last
+line. `ok` true is the only route to a witnessed cell; `why` with a reason
+closes a cell the corpus knows can never be green.
+\"\"\"
+
+import json
+import sys
+
+dimension, variant = sys.argv[1], sys.argv[2]
+
+# Read the corpus and decide. Until this is written, every cell is honestly red.
+print(json.dumps({{"ok": False, "evidence": {{"note": "verifier not implemented"}}}}))
+"""
+
+
+def _init(arguments: argparse.Namespace) -> int:
+    """Write one manifest, and a stub verifier when no command was supplied.
+
+    The manifest is built as a `Grid` before it is serialised, so a written
+    manifest is one the loader accepts. `init` takes no exceptions: a cell is
+    excepted by reacting to a run, never before one.
+    """
+    directory = Path(arguments.path)
+    identifier = arguments.id
+    verify = arguments.verify or f"verify/{identifier} {{dimension}} {{variant}}"
+
+    fields = {
+        "witnessed": 1,
+        "id": identifier,
+        "claim": arguments.claim,
+        "dimensions": _members(arguments.dimensions),
+        "variants": _members(arguments.variants),
+        "verify": verify,
+        "policy": {"on_gap": arguments.on_gap, "on_regression": arguments.on_regression},
+    }
+    if arguments.setup:
+        fields["setup"] = arguments.setup
+    if arguments.template:
+        fields["export"] = {"template": arguments.template}
+
+    try:
+        grid = Grid.model_validate(fields)
+    except ValidationError as invalid:
+        for problem in invalid.errors():
+            sys.stderr.write(f"witnessed init: {manifest_module._readable(problem)}\n")
+        return int(pytest.ExitCode.USAGE_ERROR)
+
+    document = _manifest_text(grid)
+    if arguments.stdout:
+        sys.stdout.write(document)
+        return 0
+
+    manifest = directory / f"{identifier}.grid.yaml"
+    if manifest.exists() and not arguments.force:
+        sys.stderr.write(f"witnessed init: {manifest} exists; pass --force to overwrite\n")
+        return int(pytest.ExitCode.USAGE_ERROR)
+
+    directory.mkdir(parents=True, exist_ok=True)
+    manifest.write_text(document)
+    written = [manifest]
+
+    if not arguments.verify:
+        stub = directory / "verify" / identifier
+        if not stub.exists() or arguments.force:
+            stub.parent.mkdir(parents=True, exist_ok=True)
+            stub.write_text(STUB_VERIFIER.format(id=identifier))
+            stub.chmod(0o755)
+            written.append(stub)
+
+    for path in written:
+        sys.stdout.write(f"{path}\n")
+    cells = len(grid.dimensions) * len(grid.variants)
+    sys.stdout.write(f"\n{cells} cells, none witnessed. Run: witnessed verify {manifest}\n")
+    return 0
+
+
+def _members(raw: str) -> list[str]:
+    """Split a comma-separated axis, dropping the empty members a trailing
+    comma or a stray space would otherwise introduce."""
+    return [member.strip() for member in raw.split(",") if member.strip()]
+
+
+def _manifest_text(grid: Grid) -> str:
+    """Serialise a validated grid in the order the grammar documents.
+
+    Round-tripping through a YAML dumper would sort keys and fold the verify
+    command, so the document is composed directly.
+    """
+    lines = [
+        f"witnessed: {grid.witnessed}",
+        f"id: {grid.id}",
+        f"claim: {json.dumps(grid.claim)}",
+        "",
+        f"dimensions: [{', '.join(grid.dimensions)}]",
+        f"variants:   [{', '.join(grid.variants)}]",
+        "",
+    ]
+    if grid.setup:
+        lines.append(f"setup:  {json.dumps(grid.setup)}")
+    lines.append(f"verify: {json.dumps(grid.verify)}")
+    lines += [
+        "",
+        "policy:",
+        f"  on_gap: {grid.policy.on_gap}",
+        f"  on_regression: {grid.policy.on_regression}",
+    ]
+    if grid.export:
+        lines += ["", "export:", f"  template: {json.dumps(grid.export['template'])}"]
+    lines += [
+        "",
+        "# A cell is witnessed when the verifier says so. To close one the verifier",
+        "# can never answer, add it here after a run, with a reason:",
+        "#",
+        "# except:",
+        f"#   {grid.dimensions[0]}/{grid.variants[0]}:",
+        "#     why: not-applicable",
+        '#     reason: "..."',
+        "",
+    ]
+    return "\n".join(lines)
+
+
 def _template(grid: Grid, directory: Path) -> str:
     """The prose a gap of this grid asks for, from the grid's template or the default.
 
@@ -308,6 +437,35 @@ def _parser() -> argparse.ArgumentParser:
     parser = _Parser(prog="witnessed", description="Maintain witness grids.")
     parser.add_argument("--version", action="version", version=f"witnessed {__version__}")
     commands = parser.add_subparsers(dest="command", required=True)
+
+    init = commands.add_parser("init", help="write one manifest and a stub verifier")
+    init.add_argument("--id", required=True, metavar="ID", help="the grid's identifier")
+    init.add_argument(
+        "--claim", required=True, metavar="TEXT", help="the sentence the grid defends"
+    )
+    init.add_argument(
+        "--dimensions", required=True, metavar="A,B,C", help="the rows, comma separated"
+    )
+    init.add_argument(
+        "--variants", required=True, metavar="X,Y", help="the columns, comma separated"
+    )
+    init.add_argument(
+        "--verify",
+        metavar="COMMAND",
+        help="the command answering one cell; a stub verifier is written when this is omitted",
+    )
+    init.add_argument("--path", default=".", metavar="DIR", help="where to write (default: .)")
+    init.add_argument("--setup", metavar="COMMAND", help="a command run once before any verifier")
+    init.add_argument(
+        "--template", metavar="PATH", help="a jinja template rendering the gap prompt"
+    )
+    init.add_argument("--on-gap", choices=("report", "fail"), default="report", dest="on_gap")
+    init.add_argument(
+        "--on-regression", choices=("report", "fail"), default="fail", dest="on_regression"
+    )
+    init.add_argument("--stdout", action="store_true", help="print the manifest and write nothing")
+    init.add_argument("--force", action="store_true", help="overwrite an existing manifest")
+    init.set_defaults(run=_init)
 
     verify = commands.add_parser("verify", help="run every selected cell's verifier")
     verify.add_argument("paths", nargs="*", metavar="PATH")

@@ -1,0 +1,59 @@
+#!/bin/sh
+# One verifier for both fixture grids, keyed by coordinate.
+#
+# The fixture exists so that a render target can be checked against every state
+# it claims to distinguish, which means the states must be produced rather than
+# asserted: each arm below emits what a real verifier emits to reach one state,
+# through the same last-stdout-line contract every other verifier uses.
+#
+# Four of the five states are reachable from here. `excepted` arrives by two
+# separate routes and both are exercised: b/y is closed in alpha's manifest and
+# never reaches this script at all, while c/x is closed by the verifier that
+# read it. `unknown` is reachable from nowhere in here — it is the absence of a
+# record, so no process can report it — which is why c/y has no verdict and the
+# seeded run file omits its record entirely.
+#
+# One coordinate per arm, so a cell of the fixture fails alone.
+
+set -u
+
+dimension="${1:-}"
+variant="${2:-}"
+
+case "$dimension/$variant" in
+  a/x)
+    echo '{"ok": true, "evidence": {"observed": "a/x", "layers": 3}}'
+    ;;
+  a/y)
+    echo '{"ok": false, "evidence": {"observed": "a/y", "layers": 0}}'
+    ;;
+  b/x)
+    # Errored: the runner assigns it when a process exits without a readable
+    # last line. Prose on stderr is what an unparseable verifier actually looks
+    # like, and it travels into the record as the account of what went wrong.
+    echo "demo-verifier: b/x is unreadable; the subject could not be opened" >&2
+    exit 1
+    ;;
+  b/y)
+    # Closed in alpha's manifest, so the runner never reaches this arm. It
+    # answers anyway, because a verifier invoked for a cell its manifest closed
+    # is a fault in the caller, and a fixture that says so is easier to read
+    # than one that falls through to the message for an unknown coordinate.
+    echo "demo-verifier: b/y is closed in the manifest; the runner does not call a verifier for it" >&2
+    exit 1
+    ;;
+  c/x)
+    echo '{"why": "unimplemented", "reason": "c is absent from the x variant by choice; the corpus reports the omission rather than a human restating it"}'
+    ;;
+  c/y)
+    echo "demo-verifier: c/y has no reading; unknown is the absence of a record, not a verdict" >&2
+    exit 1
+    ;;
+  solo/single)
+    echo '{"ok": true, "evidence": {"observed": "solo/single"}}'
+    ;;
+  *)
+    echo "demo-verifier: $dimension/$variant is outside either fixture grid's product" >&2
+    exit 1
+    ;;
+esac

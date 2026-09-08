@@ -1,9 +1,10 @@
 # Secrets and local tooling config
 .mcp.json
 
-# Run state: the log is history and is committed; everything else is regenerable
-.witnessed/*
-!.witnessed/runs.json
+# Run state. The run record at the invocation root is history and is committed.
+# Setup scratch and fixture state are regenerated on every run and are not.
+**/.witnessed/*
+!/.witnessed/runs.json
 
 # Python
 __pycache__/

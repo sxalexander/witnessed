@@ -1,0 +1,781 @@
+{
+  "grids": {
+    "render": {
+      "cell-state/html": {
+        "current": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "data_state_values": [
+                "errored",
+                "excepted",
+                "failed",
+                "unknown",
+                "witnessed"
+              ],
+              "expected": [
+                "errored",
+                "excepted",
+                "failed",
+                "unknown",
+                "witnessed"
+              ],
+              "snapshot": ".witnessed/snap/demo.html"
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "data_state_values": [
+                "errored",
+                "excepted",
+                "failed",
+                "unknown",
+                "witnessed"
+              ],
+              "expected": [
+                "errored",
+                "excepted",
+                "failed",
+                "unknown",
+                "witnessed"
+              ],
+              "snapshot": ".witnessed/snap/demo.html"
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        }
+      },
+      "cell-state/json": {
+        "current": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "expected": [
+                "errored",
+                "excepted",
+                "failed",
+                "unknown",
+                "witnessed"
+              ],
+              "snapshot": ".witnessed/snap/demo.json",
+              "states": [
+                "errored",
+                "excepted",
+                "failed",
+                "unknown",
+                "witnessed"
+              ]
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "expected": [
+                "errored",
+                "excepted",
+                "failed",
+                "unknown",
+                "witnessed"
+              ],
+              "snapshot": ".witnessed/snap/demo.json",
+              "states": [
+                "errored",
+                "excepted",
+                "failed",
+                "unknown",
+                "witnessed"
+              ]
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        }
+      },
+      "cell-state/md": {
+        "current": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "expected": [
+                "errored",
+                "excepted",
+                "failed",
+                "unknown",
+                "witnessed"
+              ],
+              "snapshot": ".witnessed/snap/demo.md",
+              "state_words": [
+                "errored",
+                "excepted",
+                "failed",
+                "unknown",
+                "witnessed"
+              ]
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "expected": [
+                "errored",
+                "excepted",
+                "failed",
+                "unknown",
+                "witnessed"
+              ],
+              "snapshot": ".witnessed/snap/demo.md",
+              "state_words": [
+                "errored",
+                "excepted",
+                "failed",
+                "unknown",
+                "witnessed"
+              ]
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        }
+      },
+      "cell-state/tui": {
+        "current": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "expected": 5,
+              "glyphs": [
+                "!",
+                "+",
+                "-",
+                "?",
+                "~"
+              ],
+              "snapshot": ".witnessed/snap/demo.tui"
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "expected": 5,
+              "glyphs": [
+                "!",
+                "+",
+                "-",
+                "?",
+                "~"
+              ],
+              "snapshot": ".witnessed/snap/demo.tui"
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        }
+      },
+      "except-reason/html": {
+        "current": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "excepted": [
+                "b/y",
+                "c/x"
+              ],
+              "faults": [],
+              "snapshot": ".witnessed/snap/demo.html"
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "excepted": [
+                "b/y",
+                "c/x"
+              ],
+              "faults": [],
+              "snapshot": ".witnessed/snap/demo.html"
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        }
+      },
+      "except-reason/json": {
+        "current": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "excepted": [
+                "alpha/b/y",
+                "alpha/c/x"
+              ],
+              "snapshot": ".witnessed/snap/demo.json",
+              "without_reason": []
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "excepted": [
+                "alpha/b/y",
+                "alpha/c/x"
+              ],
+              "snapshot": ".witnessed/snap/demo.json",
+              "without_reason": []
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        }
+      },
+      "except-reason/md": {
+        "current": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "defined_footnotes": [
+                "alpha-b-y",
+                "alpha-c-x"
+              ],
+              "excepted_cells": [
+                "excepted[^alpha-b-y]",
+                "excepted[^alpha-c-x]"
+              ],
+              "snapshot": ".witnessed/snap/demo.md",
+              "without_reason": []
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "defined_footnotes": [
+                "alpha-b-y",
+                "alpha-c-x"
+              ],
+              "excepted_cells": [
+                "excepted[^alpha-b-y]",
+                "excepted[^alpha-c-x]"
+              ],
+              "snapshot": ".witnessed/snap/demo.md",
+              "without_reason": []
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        }
+      },
+      "gap-policy/html": {
+        "current": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "incomplete": [],
+              "policies": [
+                {
+                  "grid": "alpha",
+                  "on_gap": "report",
+                  "on_regression": "fail"
+                },
+                {
+                  "grid": "beta",
+                  "on_gap": "fail",
+                  "on_regression": "fail"
+                }
+              ],
+              "snapshot": ".witnessed/snap/demo.html"
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "incomplete": [],
+              "policies": [
+                {
+                  "grid": "alpha",
+                  "on_gap": "report",
+                  "on_regression": "fail"
+                },
+                {
+                  "grid": "beta",
+                  "on_gap": "fail",
+                  "on_regression": "fail"
+                }
+              ],
+              "snapshot": ".witnessed/snap/demo.html"
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        }
+      },
+      "gap-policy/json": {
+        "current": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "incomplete": [],
+              "policies": {
+                "alpha": {
+                  "on_gap": "report",
+                  "on_regression": "fail"
+                },
+                "beta": {
+                  "on_gap": "fail",
+                  "on_regression": "fail"
+                }
+              },
+              "snapshot": ".witnessed/snap/demo.json"
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "incomplete": [],
+              "policies": {
+                "alpha": {
+                  "on_gap": "report",
+                  "on_regression": "fail"
+                },
+                "beta": {
+                  "on_gap": "fail",
+                  "on_regression": "fail"
+                }
+              },
+              "snapshot": ".witnessed/snap/demo.json"
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        }
+      },
+      "gap-policy/md": {
+        "current": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "policies": {
+                "alpha": {
+                  "on_gap": "report",
+                  "on_regression": "fail"
+                },
+                "beta": {
+                  "on_gap": "fail",
+                  "on_regression": "fail"
+                }
+              },
+              "snapshot": ".witnessed/snap/demo.md",
+              "without_policy": []
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "policies": {
+                "alpha": {
+                  "on_gap": "report",
+                  "on_regression": "fail"
+                },
+                "beta": {
+                  "on_gap": "fail",
+                  "on_regression": "fail"
+                }
+              },
+              "snapshot": ".witnessed/snap/demo.md",
+              "without_policy": []
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        }
+      },
+      "gap-policy/tui": {
+        "current": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "headers": [
+                "alpha  on_gap: report  on_regression: fail",
+                "beta  on_gap: fail  on_regression: fail"
+              ],
+              "policies": [
+                {
+                  "grid": "alpha",
+                  "on_gap": "report",
+                  "on_regression": "fail"
+                },
+                {
+                  "grid": "beta",
+                  "on_gap": "fail",
+                  "on_regression": "fail"
+                }
+              ],
+              "snapshot": ".witnessed/snap/demo.tui"
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "headers": [
+                "alpha  on_gap: report  on_regression: fail",
+                "beta  on_gap: fail  on_regression: fail"
+              ],
+              "policies": [
+                {
+                  "grid": "alpha",
+                  "on_gap": "report",
+                  "on_regression": "fail"
+                },
+                {
+                  "grid": "beta",
+                  "on_gap": "fail",
+                  "on_regression": "fail"
+                }
+              ],
+              "snapshot": ".witnessed/snap/demo.tui"
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        }
+      },
+      "multi-grid/html": {
+        "current": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "sections": [
+                "alpha",
+                "beta"
+              ],
+              "snapshot": ".witnessed/snap/demo.html"
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "sections": [
+                "alpha",
+                "beta"
+              ],
+              "snapshot": ".witnessed/snap/demo.html"
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        }
+      },
+      "multi-grid/json": {
+        "current": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "grids": [
+                "alpha",
+                "beta"
+              ],
+              "snapshot": ".witnessed/snap/demo.json"
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "grids": [
+                "alpha",
+                "beta"
+              ],
+              "snapshot": ".witnessed/snap/demo.json"
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        }
+      },
+      "multi-grid/md": {
+        "current": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "headings": [
+                "alpha",
+                "beta"
+              ],
+              "snapshot": ".witnessed/snap/demo.md",
+              "table_cells_per_grid": [
+                6,
+                1
+              ]
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "headings": [
+                "alpha",
+                "beta"
+              ],
+              "snapshot": ".witnessed/snap/demo.md",
+              "table_cells_per_grid": [
+                6,
+                1
+              ]
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        }
+      },
+      "multi-grid/tui": {
+        "current": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "cell_rows_per_grid": [
+                3,
+                1
+              ],
+              "grids": [
+                "alpha",
+                "beta"
+              ],
+              "snapshot": ".witnessed/snap/demo.tui"
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "cell_rows_per_grid": [
+                3,
+                1
+              ],
+              "grids": [
+                "alpha",
+                "beta"
+              ],
+              "snapshot": ".witnessed/snap/demo.tui"
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        }
+      },
+      "regression/html": {
+        "current": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "cells": 7,
+              "regressed": [
+                "a/y"
+              ],
+              "revisions": [
+                "a1b2c3d"
+              ],
+              "snapshot": ".witnessed/snap/demo.html",
+              "without_rev": []
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "cells": 7,
+              "regressed": [
+                "a/y"
+              ],
+              "revisions": [
+                "a1b2c3d"
+              ],
+              "snapshot": ".witnessed/snap/demo.html",
+              "without_rev": []
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        }
+      },
+      "regression/json": {
+        "current": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "regressed": [
+                "alpha/a/y"
+              ],
+              "snapshot": ".witnessed/snap/demo.json",
+              "without_last_witnessed_rev": []
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "regressed": [
+                "alpha/a/y"
+              ],
+              "snapshot": ".witnessed/snap/demo.json",
+              "without_last_witnessed_rev": []
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        }
+      },
+      "regression/md": {
+        "current": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "markers": [
+                "regressed"
+              ],
+              "markers_that_name_a_state": [],
+              "regressed_cells": [
+                "failed, regressed (last witnessed `a1b2c3d`)"
+              ],
+              "snapshot": ".witnessed/snap/demo.md",
+              "unmarked_gap_cells": [
+                "errored"
+              ],
+              "unmarked_gaps_carrying_a_marker": [],
+              "without_rev": []
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "markers": [
+                "regressed"
+              ],
+              "markers_that_name_a_state": [],
+              "regressed_cells": [
+                "failed, regressed (last witnessed `a1b2c3d`)"
+              ],
+              "snapshot": ".witnessed/snap/demo.md",
+              "unmarked_gap_cells": [
+                "errored"
+              ],
+              "unmarked_gaps_carrying_a_marker": [],
+              "without_rev": []
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        }
+      },
+      "regression/tui": {
+        "current": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "plain_marks": [
+                "!",
+                "+",
+                "?",
+                "~"
+              ],
+              "regressed_marks": [
+                "-*"
+              ],
+              "snapshot": ".witnessed/snap/demo.tui",
+              "suffix_collides_with_glyph": []
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T01:34:44.640069Z",
+          "result": {
+            "evidence": {
+              "plain_marks": [
+                "!",
+                "+",
+                "?",
+                "~"
+              ],
+              "regressed_marks": [
+                "-*"
+              ],
+              "snapshot": ".witnessed/snap/demo.tui",
+              "suffix_collides_with_glyph": []
+            },
+            "ok": true
+          },
+          "rev": "c22d5f1"
+        }
+      }
+    }
+  },
+  "witnessed": 1
+}

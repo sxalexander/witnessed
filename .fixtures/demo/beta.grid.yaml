@@ -1,0 +1,12 @@
+witnessed: 1
+id: beta
+claim: "A grid renders under a policy of its own, beside a grid that holds another"
+
+dimensions: [solo]
+variants:   [single]
+
+verify: "verify/demo-verifier {dimension} {variant}"
+
+policy:
+  on_gap: fail
+  on_regression: fail

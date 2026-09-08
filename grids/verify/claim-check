@@ -1,0 +1,527 @@
+#!/usr/bin/env python3
+"""The render self-grid's verifier: one assertion per cell of `render.grid.yaml`.
+
+Called once per cell as `claim-check <snapdir> <dimension> <variant>` and keyed
+by coordinate, so a render claim that stops holding in one target reddens one
+cell rather than a column [d10]. `setup` has already drawn the demo fixture to
+`<snapdir>/demo.{tui,json,md,html}`; every assertion reads exactly one of those
+files and nothing else.
+
+No assertion consults another target's snapshot. Validating the md render
+against the json render would red two cells for one renderer's bug and would
+make the json cell a hidden dependency of the other three, which is the
+opposite of a cell failing alone.
+
+Every assertion is written so that an empty or degenerate snapshot fails it. A
+state set is compared for equality against the five states the model holds
+apart rather than counted, an excepted cell must exist before its reason can be
+checked, and a coordinate outside the table below reads `ok: false` rather than
+falling through to a verdict nobody wrote.
+"""
+
+import html
+import json
+import re
+import sys
+from pathlib import Path
+
+STATES = ("witnessed", "failed", "errored", "excepted", "unknown")
+"""The five states a render must hold apart, per success criterion 1."""
+
+GAP_STATES = frozenset({"failed", "errored"})
+"""The states that make a cell a gap. A regression is one of these with a past."""
+
+POLICY_VALUES = frozenset({"report", "fail"})
+"""What `on_gap` and `on_regression` may say, in every target that spells them."""
+
+TUI_GLYPH = r"[+\-!~?]"
+"""The alphabet a tui mark starts with: punctuation, so no axis member collides.
+
+Spelled here as a character class rather than imported from the renderer,
+because a verifier that read the module under test would assert the module
+agrees with itself.
+"""
+
+_TUI_MARK = re.compile(rf"({TUI_GLYPH})([^\w\s]*)")
+_TUI_LABEL = re.compile(r"[a-z0-9][a-z0-9-]*")
+_TUI_HEADER = re.compile(r"(\S+)\s+on_gap:\s*(\S+)\s+on_regression:\s*(\S+)\s*$")
+_MD_HEADING = re.compile(r"^##\s+(\S+)\s*$")
+_MD_FOOTNOTE_REF = re.compile(r"\[\^([^\]]+)\]")
+_MD_STATE_WORD = re.compile(r"^([a-z]+)")
+_MD_REV = re.compile(r"`([0-9A-Za-z][0-9A-Za-z._-]{3,})`")
+_HTML_TD = re.compile(r"<td\b([^>]*)>")
+_HTML_SECTION = re.compile(r"<section\b([^>]*)>")
+_HTML_ATTRIBUTE = re.compile(r'([A-Za-z][A-Za-z0-9-]*)="([^"]*)"')
+_POLICY_GAP = re.compile(r"on_gap:[\s`]*([a-z]+)")
+_POLICY_REGRESSION = re.compile(r"on_regression:[\s`]*([a-z]+)")
+
+
+def main(argv: list[str]) -> int:
+    """Emit one verdict for one cell, whatever happened, and exit 0.
+
+    The JSON on the last line carries the reading. A non-zero exit is reserved
+    for the runner to interpret as `errored`, which is what an unhandled
+    exception here honestly is: the verifier did not produce a result.
+    """
+    if len(argv) != 3:
+        return _emit(False, {"usage": "claim-check <snapdir> <dimension> <variant>", "got": argv})
+
+    snapdir, dimension, variant = Path(argv[0]), argv[1], argv[2]
+    check = CHECKS.get((dimension, variant))
+    if check is None:
+        return _emit(
+            False,
+            {
+                "coordinate": f"{dimension}/{variant}",
+                "why": "outside the render self-grid's assertion table",
+            },
+        )
+
+    snapshot = snapdir / f"demo.{variant}"
+    if not snapshot.is_file():
+        return _emit(False, {"snapshot": str(snapshot), "why": "setup rendered no such target"})
+
+    ok, evidence = check(snapshot.read_text(encoding="utf-8"))
+    return _emit(ok, dict(evidence, snapshot=str(snapshot)))
+
+
+# --- tui -------------------------------------------------------------------
+#
+# The tui target is a matrix of glyphs under an 80-column budget. Every
+# assertion below reads the cell rows of that matrix and never the key line
+# above it: the key names all five glyphs whether or not a grid holds all five
+# states, so a claim proven from the key would be proven by an empty table.
+
+
+def tui_cell_state(text: str) -> tuple[bool, dict]:
+    """Five distinct glyphs appear in the tables, one per state."""
+    glyphs = sorted({mark[0] for _, marks in _tui_rows(text) for mark in marks})
+    return len(glyphs) == len(STATES), {"glyphs": glyphs, "expected": len(STATES)}
+
+
+def tui_except_reason(text: str) -> tuple[bool, dict]:
+    """Closed in the manifest, so the runner reaches this arm only in error.
+
+    It answers rather than falling through, because a verifier invoked for a
+    cell its manifest closed is a fault in the caller and a verifier that says
+    so is easier to read than one that returns the message for an unknown
+    coordinate.
+    """
+    return False, {
+        "why": "except-reason/tui is closed in render.grid.yaml; no verifier runs for it"
+    }
+
+
+def tui_regression(text: str) -> tuple[bool, dict]:
+    """The regression mark differs from every gap glyph.
+
+    A mark carrying a suffix is a regression; the suffix must be outside the
+    glyph alphabet, or a reader could not tell a regressed cell from a cell in
+    some sixth state.
+    """
+    marks = [mark for _, row in _tui_rows(text) for mark in row]
+    regressed = sorted({mark for mark in marks if len(mark) > 1})
+    plain = sorted({mark for mark in marks if len(mark) == 1})
+    suffixes = {character for mark in regressed for character in mark[1:]}
+    collisions = sorted(suffixes & set(plain))
+    return bool(regressed) and not collisions, {
+        "regressed_marks": regressed,
+        "plain_marks": plain,
+        "suffix_collides_with_glyph": collisions,
+    }
+
+
+def tui_gap_policy(text: str) -> tuple[bool, dict]:
+    """Each grid's header line shows both halves of its policy."""
+    headers = [block[0] if block else "" for block in _tui_blocks(text)]
+    read = [_TUI_HEADER.search(header) for header in headers]
+    named = [
+        {"grid": match.group(1), "on_gap": match.group(2), "on_regression": match.group(3)}
+        for match in read
+        if match
+    ]
+    ok = bool(headers) and len(named) == len(headers)
+    ok = ok and all(
+        entry["on_gap"] in POLICY_VALUES and entry["on_regression"] in POLICY_VALUES
+        for entry in named
+    )
+    return ok, {"headers": headers, "policies": named}
+
+
+def tui_multi_grid(text: str) -> tuple[bool, dict]:
+    """Two grids appear, each with an id of its own and a table of its own."""
+    blocks = _tui_blocks(text)
+    ids = [match.group(1) for match in (_TUI_HEADER.search(b[0]) for b in blocks if b) if match]
+    rows = [len(_tui_rows("\n".join(block))) for block in blocks]
+    return len(blocks) == 2 and len(set(ids)) == 2 and all(rows), {
+        "grids": ids,
+        "cell_rows_per_grid": rows,
+    }
+
+
+# --- json ------------------------------------------------------------------
+#
+# The reference render, and the only one a consumer parses rather than reads.
+# Its cells live under `.grids[].cells[]`, so a claim over every cell of the
+# document is the union across grids.
+
+
+def json_cell_state(text: str) -> tuple[bool, dict]:
+    """Every state the model holds apart appears, and nothing else does."""
+    states = sorted({cell["state"] for _, cell in _json_cells(text)})
+    return states == sorted(STATES), {"states": states, "expected": sorted(STATES)}
+
+
+def json_except_reason(text: str) -> tuple[bool, dict]:
+    """Every excepted cell carries a non-empty reason."""
+    excepted = [(key, cell) for key, cell in _json_cells(text) if cell["state"] == "excepted"]
+    silent = [
+        f"{key}/{cell['id']}" for key, cell in excepted if not (cell.get("reason") or "").strip()
+    ]
+    return bool(excepted) and not silent, {
+        "excepted": [f"{key}/{cell['id']}" for key, cell in excepted],
+        "without_reason": silent,
+    }
+
+
+def json_regression(text: str) -> tuple[bool, dict]:
+    """A regressed cell says so, and names the revision it was last true at."""
+    regressed = [(key, cell) for key, cell in _json_cells(text) if cell.get("regression") is True]
+    unnamed = [
+        f"{key}/{cell['id']}"
+        for key, cell in regressed
+        if not ((cell.get("last_witnessed") or {}).get("rev") or "").strip()
+    ]
+    return bool(regressed) and not unnamed, {
+        "regressed": [f"{key}/{cell['id']}" for key, cell in regressed],
+        "without_last_witnessed_rev": unnamed,
+    }
+
+
+def json_gap_policy(text: str) -> tuple[bool, dict]:
+    """Every grid object carries both halves of its policy."""
+    grids = json.loads(text)["grids"]
+    policies = {key: grid.get("policy") or {} for key, grid in grids.items()}
+    incomplete = sorted(
+        key
+        for key, policy in policies.items()
+        if policy.get("on_gap") not in POLICY_VALUES
+        or policy.get("on_regression") not in POLICY_VALUES
+    )
+    return bool(grids) and not incomplete, {"policies": policies, "incomplete": incomplete}
+
+
+def json_multi_grid(text: str) -> tuple[bool, dict]:
+    """`.grids` has two keys."""
+    grids = sorted(json.loads(text)["grids"])
+    return len(grids) == 2, {"grids": grids}
+
+
+# --- md --------------------------------------------------------------------
+#
+# The target a maintainer and a reviewer read in the same place. A cell is a
+# state word, so the assertions read words where the tui reads glyphs, and
+# prose that will not fit a table cell arrives as a footnote.
+
+
+def md_cell_state(text: str) -> tuple[bool, dict]:
+    """Every state the model holds apart appears as a word in some table cell."""
+    words = sorted({word for _, _, word, _ in _md_cells(text) if word})
+    return words == sorted(STATES), {"state_words": words, "expected": sorted(STATES)}
+
+
+def md_except_reason(text: str) -> tuple[bool, dict]:
+    """Every excepted cell cites a footnote, and every citation is defined."""
+    definitions = _md_footnotes(text)
+    excepted = [(row, cell) for row, cell, word, _ in _md_cells(text) if word == "excepted"]
+    dangling = []
+    for row, cell in excepted:
+        labels = _MD_FOOTNOTE_REF.findall(cell)
+        if not labels or not any(definitions.get(label, "").strip() for label in labels):
+            dangling.append(f"{row}: {cell}")
+    return bool(excepted) and not dangling, {
+        "excepted_cells": [cell for _, cell in excepted],
+        "defined_footnotes": sorted(definitions),
+        "without_reason": dangling,
+    }
+
+
+def md_regression(text: str) -> tuple[bool, dict]:
+    """A regressed gap opens with a mark no state word spells, and names the rev.
+
+    The mark is read as the first word a cell shows after its state word, and a
+    gap that is not a regression must not carry it: a marker a rollout cell also
+    spells would tell a reader nothing about which red cell is news.
+    """
+    gaps = [(cell, rest) for _, cell, word, rest in _md_cells(text) if word in GAP_STATES]
+    marked = [(cell, rest) for cell, rest in gaps if rest]
+    plain = [cell for cell, rest in gaps if not rest]
+    markers = sorted({_leading_word(rest) for _, rest in marked})
+    unnamed = [cell for cell, rest in marked if not _MD_REV.search(rest)]
+    borrowed = sorted(set(markers) & set(STATES))
+    leaked = sorted(
+        cell
+        for cell in plain
+        for marker in markers
+        if marker and re.search(rf"\b{re.escape(marker)}\b", cell)
+    )
+    ok = bool(marked) and all(markers) and not unnamed and not borrowed and not leaked
+    return ok, {
+        "regressed_cells": [cell for cell, _ in marked],
+        "unmarked_gap_cells": plain,
+        "markers": markers,
+        "without_rev": unnamed,
+        "markers_that_name_a_state": borrowed,
+        "unmarked_gaps_carrying_a_marker": leaked,
+    }
+
+
+def md_gap_policy(text: str) -> tuple[bool, dict]:
+    """Each grid's heading carries both halves of its policy beneath it."""
+    blocks = _md_blocks(text)
+    read = {grid: _policy_in(lines) for grid, lines in blocks}
+    missing = sorted(grid for grid, policy in read.items() if policy is None)
+    return bool(blocks) and not missing, {"policies": read, "without_policy": missing}
+
+
+def md_multi_grid(text: str) -> tuple[bool, dict]:
+    """Two H2 headings, one per grid, each above a table of its own."""
+    blocks = _md_blocks(text)
+    ids = [grid for grid, _ in blocks]
+    rows = [len(_md_cells("\n".join(lines))) for _, lines in blocks]
+    return len(blocks) == 2 and len(set(ids)) == 2 and all(rows), {
+        "headings": ids,
+        "table_cells_per_grid": rows,
+    }
+
+
+# --- html ------------------------------------------------------------------
+#
+# The one target a consumer queries with a selector instead of a regular
+# expression over prose. Every assertion therefore reads attributes, and reads
+# them off the elements rather than out of the stylesheet.
+
+
+def html_cell_state(text: str) -> tuple[bool, dict]:
+    """Every state the model holds apart appears as a `data-state` value."""
+    states = sorted({cell["data-state"] for cell in _html_cells(text) if "data-state" in cell})
+    return states == sorted(STATES), {"data_state_values": states, "expected": sorted(STATES)}
+
+
+def html_except_reason(text: str) -> tuple[bool, dict]:
+    """Every excepted cell carries its reason in `title`, as prose and nothing else.
+
+    Equality with the reason the manifest or the verifier wrote is not
+    checkable from the rendered document alone, so what is asserted is the
+    property the renderer commits to: the attribute holds prose rather than a
+    restatement of the state word or the coordinate.
+    """
+    excepted = [cell for cell in _html_cells(text) if cell.get("data-state") == "excepted"]
+    faults = []
+    for cell in excepted:
+        title = html.unescape(cell.get("title", "")).strip()
+        if not title:
+            faults.append({"cell": cell.get("data-cell"), "why": "no title"})
+        elif title in {cell.get("data-state"), cell.get("data-cell")} or " " not in title:
+            faults.append(
+                {"cell": cell.get("data-cell"), "why": "title is not prose", "title": title}
+            )
+    return bool(excepted) and not faults, {
+        "excepted": [cell.get("data-cell") for cell in excepted],
+        "faults": faults,
+    }
+
+
+def html_regression(text: str) -> tuple[bool, dict]:
+    """A regressed cell carries `data-regression="true"` and the revision."""
+    cells = _html_cells(text)
+    regressed = [cell for cell in cells if cell.get("data-regression") == "true"]
+    unnamed = [
+        cell.get("data-cell")
+        for cell in regressed
+        if not cell.get("data-last-witnessed-rev", "").strip()
+    ]
+    return bool(regressed) and not unnamed, {
+        "regressed": [cell.get("data-cell") for cell in regressed],
+        "revisions": [cell.get("data-last-witnessed-rev") for cell in regressed],
+        "without_rev": unnamed,
+        "cells": len(cells),
+    }
+
+
+def html_gap_policy(text: str) -> tuple[bool, dict]:
+    """Every section carries both halves of its grid's policy."""
+    sections = _html_sections(text)
+    incomplete = [
+        section.get("data-grid")
+        for section in sections
+        if section.get("data-on-gap") not in POLICY_VALUES
+        or section.get("data-on-regression") not in POLICY_VALUES
+    ]
+    return bool(sections) and not incomplete, {
+        "policies": [
+            {
+                "grid": section.get("data-grid"),
+                "on_gap": section.get("data-on-gap"),
+                "on_regression": section.get("data-on-regression"),
+            }
+            for section in sections
+        ],
+        "incomplete": incomplete,
+    }
+
+
+def html_multi_grid(text: str) -> tuple[bool, dict]:
+    """Two `<section>` elements, one per grid."""
+    ids = [section.get("data-grid") for section in _html_sections(text)]
+    return len(ids) == 2 and len(set(ids)) == 2, {"sections": ids}
+
+
+CHECKS = {
+    ("cell-state", "tui"): tui_cell_state,
+    ("cell-state", "json"): json_cell_state,
+    ("cell-state", "md"): md_cell_state,
+    ("cell-state", "html"): html_cell_state,
+    ("except-reason", "tui"): tui_except_reason,
+    ("except-reason", "json"): json_except_reason,
+    ("except-reason", "md"): md_except_reason,
+    ("except-reason", "html"): html_except_reason,
+    ("regression", "tui"): tui_regression,
+    ("regression", "json"): json_regression,
+    ("regression", "md"): md_regression,
+    ("regression", "html"): html_regression,
+    ("gap-policy", "tui"): tui_gap_policy,
+    ("gap-policy", "json"): json_gap_policy,
+    ("gap-policy", "md"): md_gap_policy,
+    ("gap-policy", "html"): html_gap_policy,
+    ("multi-grid", "tui"): tui_multi_grid,
+    ("multi-grid", "json"): json_multi_grid,
+    ("multi-grid", "md"): md_multi_grid,
+    ("multi-grid", "html"): html_multi_grid,
+}
+"""Every coordinate of the render self-grid, and the assertion it stands for.
+
+A coordinate absent from this mapping reads `ok: false`. Falling through to a
+verdict would let a dimension added to the manifest go green before anyone
+wrote what it asserts, which is the one bug that would silently pass the whole
+grid.
+"""
+
+
+def _tui_blocks(text: str) -> list[list[str]]:
+    """The lines of each grid, split on the full-width rule that opens one."""
+    lines = text.splitlines()
+    starts = [index for index, line in enumerate(lines) if line and set(line) == {"="}]
+    bounds = starts + [len(lines)]
+    return [lines[start + 1 : bounds[position + 1]] for position, start in enumerate(starts)]
+
+
+def _tui_rows(text: str) -> list[tuple[str, list[str]]]:
+    """Every cell row of every table: a row label and the marks beside it.
+
+    A row is recognised by its shape rather than by its position, so the key
+    line, the rules, the headers, the claims, the axis row, and the regression
+    notes are all excluded: none of them is a label followed by nothing but
+    marks.
+    """
+    rows = []
+    for line in text.splitlines():
+        parts = line.split()
+        if len(parts) < 2 or not _TUI_LABEL.fullmatch(parts[0]):
+            continue
+        marks = [_TUI_MARK.fullmatch(part) for part in parts[1:]]
+        if all(marks):
+            rows.append((parts[0], [match.group(0) for match in marks]))
+    return rows
+
+
+def _json_cells(text: str) -> list[tuple[str, dict]]:
+    """Every cell of every grid, carrying the id of the grid it came from."""
+    grids = json.loads(text)["grids"]
+    return [(key, cell) for key, grid in grids.items() for cell in grid["cells"]]
+
+
+def _md_blocks(text: str) -> list[tuple[str, list[str]]]:
+    """The lines under each H2, keyed by the grid the heading names."""
+    blocks: list[tuple[str, list[str]]] = []
+    for line in text.splitlines():
+        heading = _MD_HEADING.match(line)
+        if heading:
+            blocks.append((heading.group(1), []))
+        elif blocks:
+            blocks[-1][1].append(line)
+    return blocks
+
+
+def _md_cells(text: str) -> list[tuple[str, str, str, str]]:
+    """Every body cell of every table: its row, its text, its state word, its rest.
+
+    Header and alignment rows are excluded by requiring the first field to be
+    an axis member, which is spelled `[a-z0-9-]` and can be neither empty nor
+    `:--`.
+    """
+    cells = []
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not (stripped.startswith("|") and stripped.endswith("|")):
+            continue
+        fields = [field.strip() for field in stripped[1:-1].split("|")]
+        if len(fields) < 2 or not _TUI_LABEL.fullmatch(fields[0]):
+            continue
+        for field in fields[1:]:
+            word = _MD_STATE_WORD.match(field)
+            state = word.group(1) if word else ""
+            rest = _MD_FOOTNOTE_REF.sub("", field[len(state) :]).strip(" ,")
+            cells.append((fields[0], field, state, rest))
+    return cells
+
+
+def _leading_word(text: str) -> str:
+    """The first word of a cell's remainder: the mark it opens with, if any."""
+    match = re.match(r"[a-z]+", text)
+    return match.group(0) if match else ""
+
+
+def _md_footnotes(text: str) -> dict[str, str]:
+    """Every footnote definition in the document, by label."""
+    found = {}
+    for line in text.splitlines():
+        match = re.match(r"^\[\^([^\]]+)\]:\s*(.*)$", line)
+        if match:
+            found[match.group(1)] = match.group(2)
+    return found
+
+
+def _html_cells(text: str) -> list[dict[str, str]]:
+    """The attributes of every `<td>` in the document."""
+    return [_html_attributes(match.group(1)) for match in _HTML_TD.finditer(text)]
+
+
+def _html_sections(text: str) -> list[dict[str, str]]:
+    """The attributes of every `<section>` in the document."""
+    return [_html_attributes(match.group(1)) for match in _HTML_SECTION.finditer(text)]
+
+
+def _html_attributes(source: str) -> dict[str, str]:
+    return dict(_HTML_ATTRIBUTE.findall(source))
+
+
+def _policy_in(lines: list[str]) -> dict[str, str] | None:
+    """Both halves of a policy, from the first line of a block that states one."""
+    for line in lines:
+        gap = _POLICY_GAP.search(line)
+        regression = _POLICY_REGRESSION.search(line)
+        if gap and regression:
+            if gap.group(1) in POLICY_VALUES and regression.group(1) in POLICY_VALUES:
+                return {"on_gap": gap.group(1), "on_regression": regression.group(1)}
+            return None
+    return None
+
+
+def _emit(ok: bool, evidence: dict) -> int:
+    print(json.dumps({"ok": ok, "evidence": evidence}))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

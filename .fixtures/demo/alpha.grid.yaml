@@ -1,0 +1,17 @@
+witnessed: 1
+id: alpha
+claim: "Every cell state a render must hold apart occurs in one grid"
+
+dimensions: [a, b, c]
+variants:   [x, y]
+
+verify: "verify/demo-verifier {dimension} {variant}"
+
+policy:
+  on_gap: report
+  on_regression: fail
+
+except:
+  b/y:
+    why: not-applicable
+    reason: "b is defined only over x; the y variant names a coordinate the subject cannot occupy, so no verifier could ever witness it"

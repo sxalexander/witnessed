@@ -1,0 +1,24 @@
+witnessed: 1
+id: render
+claim: "Witnessed renders any grid to any target"
+
+dimensions: [cell-state, except-reason, regression, gap-policy, multi-grid]
+variants:   [tui, json, md, html]
+
+setup: |
+  set -e
+  mkdir -p .witnessed/snap ../.fixtures/demo/.witnessed
+  cp ../.fixtures/demo/seed-runs.json ../.fixtures/demo/.witnessed/runs.json
+  for t in tui json md html; do
+    uv run witnessed check ../.fixtures/demo \
+      --state-dir ../.fixtures/demo/.witnessed --$t > .witnessed/snap/demo.$t
+  done
+
+verify: "verify/claim-check .witnessed/snap {dimension} {variant}"
+
+policy: { on_gap: fail, on_regression: fail }
+
+except:
+  except-reason/tui:
+    why: not-applicable
+    reason: "an 80-column table has no room for prose; the json target carries it"

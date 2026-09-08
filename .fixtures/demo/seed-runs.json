@@ -1,0 +1,100 @@
+{
+  "grids": {
+    "alpha": {
+      "a/x": {
+        "current": {
+          "at": "2026-09-07T09:00:00Z",
+          "result": {
+            "evidence": {
+              "layers": 3,
+              "observed": "a/x"
+            },
+            "ok": true
+          },
+          "rev": "e4f5a6b"
+        },
+        "last_witnessed": {
+          "at": "2026-09-07T09:00:00Z",
+          "result": {
+            "evidence": {
+              "layers": 3,
+              "observed": "a/x"
+            },
+            "ok": true
+          },
+          "rev": "e4f5a6b"
+        }
+      },
+      "a/y": {
+        "current": {
+          "at": "2026-09-07T09:00:00Z",
+          "result": {
+            "evidence": {
+              "layers": 0,
+              "observed": "a/y"
+            },
+            "ok": false
+          },
+          "rev": "e4f5a6b"
+        },
+        "last_witnessed": {
+          "at": "2026-09-01T16:40:11Z",
+          "result": {
+            "evidence": {
+              "layers": 3,
+              "observed": "a/y"
+            },
+            "ok": true
+          },
+          "rev": "a1b2c3d"
+        }
+      },
+      "b/x": {
+        "current": {
+          "at": "2026-09-07T09:00:00Z",
+          "result": {
+            "error": "`verify/demo-verifier b x` exited 1 and wrote nothing to stdout\nstderr:\ndemo-verifier: b/x is unreadable; the subject could not be opened"
+          },
+          "rev": "e4f5a6b"
+        },
+        "last_witnessed": null
+      },
+      "c/x": {
+        "current": {
+          "at": "2026-09-07T09:00:00Z",
+          "result": {
+            "reason": "c is absent from the x variant by choice; the corpus reports the omission rather than a human restating it",
+            "why": "unimplemented"
+          },
+          "rev": "e4f5a6b"
+        },
+        "last_witnessed": null
+      }
+    },
+    "beta": {
+      "solo/single": {
+        "current": {
+          "at": "2026-09-07T09:00:00Z",
+          "result": {
+            "evidence": {
+              "observed": "solo/single"
+            },
+            "ok": true
+          },
+          "rev": "e4f5a6b"
+        },
+        "last_witnessed": {
+          "at": "2026-09-07T09:00:00Z",
+          "result": {
+            "evidence": {
+              "observed": "solo/single"
+            },
+            "ok": true
+          },
+          "rev": "e4f5a6b"
+        }
+      }
+    }
+  },
+  "witnessed": 1
+}

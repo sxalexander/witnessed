@@ -1,9 +1,554 @@
 {
   "grids": {
+    "quickstart": {
+      "close-gap/bare": {
+        "current": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "install/es": "witnessed",
+                "manifest_unedited": true
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "install/es": "witnessed",
+                "manifest_unedited": true
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        }
+      },
+      "close-gap/node": {
+        "current": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "install/es": "witnessed",
+                "manifest_unedited": true
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "install/es": "witnessed",
+                "manifest_unedited": true
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        }
+      },
+      "close-gap/python": {
+        "current": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "install/es": "witnessed",
+                "manifest_unedited": true
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "install/es": "witnessed",
+                "manifest_unedited": true
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        }
+      },
+      "except/bare": {
+        "current": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "api/es": "excepted",
+                "reason_present": true
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "api/es": "excepted",
+                "reason_present": true
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        }
+      },
+      "except/node": {
+        "current": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "api/es": "excepted",
+                "reason_present": true
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "api/es": "excepted",
+                "reason_present": true
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        }
+      },
+      "except/python": {
+        "current": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "api/es": "excepted",
+                "reason_present": true
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "api/es": "excepted",
+                "reason_present": true
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        }
+      },
+      "export/bare": {
+        "current": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "earlier_steps_unmet": [
+                "regression"
+              ],
+              "step": {
+                "first_prompt": [
+                  "build a solution for install/es"
+                ],
+                "lines": 3
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "earlier_steps_unmet": [
+                "regression"
+              ],
+              "step": {
+                "first_prompt": [
+                  "build a solution for install/es"
+                ],
+                "lines": 3
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        }
+      },
+      "export/node": {
+        "current": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "first_prompt": [
+                  "build a solution for install/es"
+                ],
+                "lines": 3
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "first_prompt": [
+                  "build a solution for install/es"
+                ],
+                "lines": 3
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        }
+      },
+      "export/python": {
+        "current": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "first_prompt": [
+                  "build a solution for install/es"
+                ],
+                "lines": 3
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "first_prompt": [
+                  "build a solution for install/es"
+                ],
+                "lines": 3
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        }
+      },
+      "first-run/bare": {
+        "current": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "exit": 0,
+                "gaps": 4,
+                "witnessed": [
+                  "install/en",
+                  "usage/en"
+                ]
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "exit": 0,
+                "gaps": 4,
+                "witnessed": [
+                  "install/en",
+                  "usage/en"
+                ]
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        }
+      },
+      "first-run/node": {
+        "current": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "exit": 0,
+                "gaps": 4,
+                "witnessed": [
+                  "install/en",
+                  "usage/en"
+                ]
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "exit": 0,
+                "gaps": 4,
+                "witnessed": [
+                  "install/en",
+                  "usage/en"
+                ]
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        }
+      },
+      "first-run/python": {
+        "current": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "exit": 0,
+                "gaps": 4,
+                "witnessed": [
+                  "install/en",
+                  "usage/en"
+                ]
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "exit": 0,
+                "gaps": 4,
+                "witnessed": [
+                  "install/en",
+                  "usage/en"
+                ]
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        }
+      },
+      "init/bare": {
+        "current": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "manifest": "docs.grid.yaml"
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "manifest": "docs.grid.yaml"
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        }
+      },
+      "init/node": {
+        "current": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "manifest": "docs.grid.yaml"
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "manifest": "docs.grid.yaml"
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        }
+      },
+      "init/python": {
+        "current": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "manifest": "docs.grid.yaml"
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "manifest": "docs.grid.yaml"
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        }
+      },
+      "regression/bare": {
+        "current": {
+          "at": "2026-09-08T19:13:55.573397Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "exit": 1,
+                "install/es": "failed",
+                "last_witnessed_rev": null,
+                "printed": "  install/es  regression: last witnessed at an unrecorded revision",
+                "regression": true
+              }
+            },
+            "ok": false
+          },
+          "rev": "8062773"
+        },
+        "last_witnessed": null
+      },
+      "regression/node": {
+        "current": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "exit": 1,
+                "install/es": "failed",
+                "last_witnessed_rev": "79380a2",
+                "printed": "  install/es  regression: last witnessed at rev 79380a2",
+                "regression": true
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "exit": 1,
+                "install/es": "failed",
+                "last_witnessed_rev": "79380a2",
+                "printed": "  install/es  regression: last witnessed at rev 79380a2",
+                "regression": true
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        }
+      },
+      "regression/python": {
+        "current": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "exit": 1,
+                "install/es": "failed",
+                "last_witnessed_rev": "553da41",
+                "printed": "  install/es  regression: last witnessed at rev 553da41",
+                "regression": true
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        },
+        "last_witnessed": {
+          "at": "2026-09-08T19:15:22.993243Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "exit": 1,
+                "install/es": "failed",
+                "last_witnessed_rev": "553da41",
+                "printed": "  install/es  regression: last witnessed at rev 553da41",
+                "regression": true
+              }
+            },
+            "ok": true
+          },
+          "rev": "8062773"
+        }
+      }
+    },
     "render": {
       "cell-state/html": {
         "current": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "data_state_values": [
@@ -24,10 +569,10 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         },
         "last_witnessed": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "data_state_values": [
@@ -48,12 +593,12 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         }
       },
       "cell-state/json": {
         "current": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "expected": [
@@ -74,10 +619,10 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         },
         "last_witnessed": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "expected": [
@@ -98,12 +643,12 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         }
       },
       "cell-state/md": {
         "current": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "expected": [
@@ -124,10 +669,10 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         },
         "last_witnessed": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "expected": [
@@ -148,12 +693,12 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         }
       },
       "cell-state/tui": {
         "current": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "expected": 5,
@@ -168,10 +713,10 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         },
         "last_witnessed": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "expected": 5,
@@ -186,12 +731,12 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         }
       },
       "except-reason/html": {
         "current": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "excepted": [
@@ -203,10 +748,10 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         },
         "last_witnessed": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "excepted": [
@@ -218,12 +763,12 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         }
       },
       "except-reason/json": {
         "current": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "excepted": [
@@ -235,10 +780,10 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         },
         "last_witnessed": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "excepted": [
@@ -250,12 +795,12 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         }
       },
       "except-reason/md": {
         "current": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "defined_footnotes": [
@@ -271,10 +816,10 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         },
         "last_witnessed": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "defined_footnotes": [
@@ -290,12 +835,12 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         }
       },
       "gap-policy/html": {
         "current": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "incomplete": [],
@@ -315,10 +860,10 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         },
         "last_witnessed": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "incomplete": [],
@@ -338,12 +883,12 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         }
       },
       "gap-policy/json": {
         "current": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "incomplete": [],
@@ -361,10 +906,10 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         },
         "last_witnessed": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "incomplete": [],
@@ -382,12 +927,12 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         }
       },
       "gap-policy/md": {
         "current": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "policies": {
@@ -405,10 +950,10 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         },
         "last_witnessed": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "policies": {
@@ -426,12 +971,12 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         }
       },
       "gap-policy/tui": {
         "current": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "headers": [
@@ -454,10 +999,10 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         },
         "last_witnessed": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "headers": [
@@ -480,12 +1025,12 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         }
       },
       "multi-grid/html": {
         "current": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "sections": [
@@ -496,10 +1041,10 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         },
         "last_witnessed": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "sections": [
@@ -510,12 +1055,12 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         }
       },
       "multi-grid/json": {
         "current": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "grids": [
@@ -526,10 +1071,10 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         },
         "last_witnessed": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "grids": [
@@ -540,12 +1085,12 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         }
       },
       "multi-grid/md": {
         "current": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "headings": [
@@ -560,10 +1105,10 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         },
         "last_witnessed": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "headings": [
@@ -578,12 +1123,12 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         }
       },
       "multi-grid/tui": {
         "current": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "cell_rows_per_grid": [
@@ -598,10 +1143,10 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         },
         "last_witnessed": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "cell_rows_per_grid": [
@@ -616,12 +1161,12 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         }
       },
       "regression/html": {
         "current": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "cells": 7,
@@ -636,10 +1181,10 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         },
         "last_witnessed": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "cells": 7,
@@ -654,12 +1199,12 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         }
       },
       "regression/json": {
         "current": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "regressed": [
@@ -670,10 +1215,10 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         },
         "last_witnessed": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "regressed": [
@@ -684,12 +1229,12 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         }
       },
       "regression/md": {
         "current": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "markers": [
@@ -708,10 +1253,10 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         },
         "last_witnessed": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "markers": [
@@ -730,12 +1275,12 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         }
       },
       "regression/tui": {
         "current": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "plain_marks": [
@@ -752,10 +1297,10 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         },
         "last_witnessed": {
-          "at": "2026-09-08T02:53:35.967382Z",
+          "at": "2026-09-08T19:14:55.217429Z",
           "result": {
             "evidence": {
               "plain_marks": [
@@ -772,7 +1317,7 @@
             },
             "ok": true
           },
-          "rev": "6644b1d"
+          "rev": "8062773"
         }
       }
     }

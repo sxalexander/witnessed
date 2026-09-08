@@ -1,0 +1,214 @@
+#!/usr/bin/env python3
+"""Replay one step of QUICKSTART.md in one kind of project and report the cell.
+
+Each cell runs the quickstart from its first command up to and including its
+own step, in a directory seeded for its variant. A cell therefore fails alone,
+and a step that only works because an earlier one left state behind cannot
+borrow that state from a neighbouring cell.
+
+The assertions are what the document promises a reader, not what the code
+happens to do: a step whose printed output no longer matches the page is a red
+cell even when nothing crashed.
+"""
+
+import json
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parents[2]
+
+CLAIM = "Every guide exists in every supported language"
+VERIFY = (
+    'test -f docs/{variant}/{dimension}.md '
+    '&& echo "{\\"ok\\": true}" || echo "{\\"ok\\": false}"'
+)
+EXCEPTION = """except:
+  api/es:
+    why: unimplemented
+    reason: "the API guide is generated from source; the generator has no Spanish output"
+"""
+
+STEPS = ("init", "first-run", "close-gap", "except", "regression", "export")
+
+
+def witnessed(*arguments, cwd):
+    """Invoke the CLI the way a reader of the quickstart would."""
+    return subprocess.run(
+        ["uv", "run", "--project", str(REPO), "witnessed", *arguments],
+        cwd=cwd,
+        capture_output=True,
+        text=True,
+    )
+
+
+def cells(directory):
+    """The grid as the reader would read it, keyed by coordinate."""
+    finished = witnessed("check", "docs.grid.yaml", "--json", cwd=directory)
+    document = json.loads(finished.stdout)
+    return {cell["id"]: cell for cell in document["grids"]["docs"]["cells"]}
+
+
+def git(directory, *arguments):
+    subprocess.run(
+        ["git", "-c", "user.email=grid@witnessed", "-c", "user.name=grid", *arguments],
+        cwd=directory,
+        capture_output=True,
+        check=False,
+    )
+
+
+def seed(directory, variant):
+    """Write the corpus the quickstart starts from, inside one kind of project.
+
+    The variants partition what else in a directory could interfere: a project
+    with its own pytest, a project with a large vendored tree, and a folder
+    with neither and no version control.
+    """
+    (directory / "docs" / "en").mkdir(parents=True)
+    (directory / "docs" / "en" / "install.md").write_text("# Install\n")
+    (directory / "docs" / "en" / "usage.md").write_text("# Usage\n")
+
+    if variant == "python":
+        (directory / "pyproject.toml").write_text(
+            '[project]\nname = "host"\nversion = "0"\nrequires-python = ">=3.12"\n'
+        )
+        (directory / "pytest.ini").write_text("[pytest]\naddopts = --strict-markers -q\n")
+        (directory / "conftest.py").write_text("collect_ignore_glob = []\n")
+        (directory / "tests").mkdir()
+        (directory / "tests" / "test_host.py").write_text("def test_host():\n    assert True\n")
+    elif variant == "node":
+        (directory / "package.json").write_text('{"name": "host", "version": "0.0.0"}\n')
+        vendored = directory / "node_modules" / "some-package"
+        vendored.mkdir(parents=True)
+        (vendored / "vendored.grid.yaml").write_text(
+            "witnessed: 1\nid: vendored\nclaim: not mine\n"
+            "dimensions: [a]\nvariants: [x]\nverify: 'false'\n"
+        )
+
+    if variant != "bare":
+        git(directory, "init", "-q", ".")
+        git(directory, "add", "-A")
+        git(directory, "commit", "-qm", "seed")
+
+
+def step_init(directory):
+    finished = witnessed(
+        "init",
+        "--id=docs",
+        f"--claim={CLAIM}",
+        "--dimensions=install,usage,api",
+        "--variants=en,es",
+        f"--verify={VERIFY}",
+        cwd=directory,
+    )
+    manifest = directory / "docs.grid.yaml"
+    if finished.returncode != 0:
+        return False, {"exit": finished.returncode, "stderr": finished.stderr[-400:]}
+    if not manifest.exists():
+        return False, {"note": "init reported success and wrote no manifest"}
+    if "6 cells, none witnessed" not in finished.stdout:
+        return False, {"note": "the cell count the page prints is gone", "said": finished.stdout}
+    return True, {"manifest": manifest.name}
+
+
+def step_first_run(directory):
+    finished = witnessed("verify", "docs.grid.yaml", cwd=directory)
+    state = cells(directory)
+    witnessed_cells = sorted(k for k, c in state.items() if c["state"] == "witnessed")
+    failed = sorted(k for k, c in state.items() if c["state"] == "failed")
+    ok = (
+        finished.returncode == 0
+        and witnessed_cells == ["install/en", "usage/en"]
+        and len(failed) == 4
+    )
+    return ok, {"exit": finished.returncode, "witnessed": witnessed_cells, "gaps": len(failed)}
+
+
+def step_close_gap(directory):
+    (directory / "docs" / "es").mkdir(parents=True, exist_ok=True)
+    (directory / "docs" / "es" / "install.md").write_text("# Instalación\n")
+    manifest_before = (directory / "docs.grid.yaml").read_text()
+    witnessed("verify", "docs.grid.yaml", cwd=directory)
+    cell = cells(directory)["install/es"]
+    unedited = manifest_before == (directory / "docs.grid.yaml").read_text()
+    return cell["state"] == "witnessed" and unedited, {
+        "install/es": cell["state"],
+        "manifest_unedited": unedited,
+    }
+
+
+def step_except(directory):
+    manifest = directory / "docs.grid.yaml"
+    manifest.write_text(manifest.read_text() + EXCEPTION)
+    witnessed("verify", "docs.grid.yaml", cwd=directory)
+    cell = cells(directory)["api/es"]
+    reason = cell.get("reason") or ""
+    return cell["state"] == "excepted" and "generator" in reason, {
+        "api/es": cell["state"],
+        "reason_present": bool(reason),
+    }
+
+
+def step_regression(directory):
+    (directory / "docs" / "es" / "install.md").unlink()
+    finished = witnessed("verify", "docs.grid.yaml", cwd=directory)
+    cell = cells(directory)["install/es"]
+    revision = (cell.get("last_witnessed") or {}).get("rev")
+    return (
+        cell["regression"] is True and finished.returncode == 1 and bool(revision)
+    ), {
+        "install/es": cell["state"],
+        "regression": cell["regression"],
+        "exit": finished.returncode,
+        "last_witnessed_rev": revision,
+        "printed": finished.stdout.strip().splitlines()[-1] if finished.stdout else "",
+    }
+
+
+def step_export(directory):
+    finished = witnessed("gap", "docs.grid.yaml", "--export", cwd=directory)
+    lines = [json.loads(line) for line in finished.stdout.splitlines() if line.strip()]
+    prompts = [line.get("prompt") for line in lines]
+    return bool(lines) and all(prompts), {"lines": len(lines), "first_prompt": prompts[:1]}
+
+
+RUN = {
+    "init": step_init,
+    "first-run": step_first_run,
+    "close-gap": step_close_gap,
+    "except": step_except,
+    "regression": step_regression,
+    "export": step_export,
+}
+
+
+def main():
+    step, variant = sys.argv[1], sys.argv[2]
+    if step not in RUN:
+        print(json.dumps({"ok": False, "evidence": {"note": f"no such step: {step}"}}))
+        return
+    directory = Path(tempfile.mkdtemp(prefix=f"qs-{step}-{variant}-"))
+    try:
+        seed(directory, variant)
+        evidence = {}
+        unmet = []
+        for name in STEPS:
+            ok, detail = RUN[name](directory)
+            if name == step:
+                evidence["step"] = detail
+                if unmet:
+                    evidence["earlier_steps_unmet"] = unmet
+                print(json.dumps({"ok": ok, "evidence": evidence}))
+                return
+            if not ok:
+                unmet.append(name)
+    except Exception as broke:
+        print(json.dumps({"ok": False, "evidence": {"raised": f"{type(broke).__name__}: {broke}"}}))
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
+
+
+main()

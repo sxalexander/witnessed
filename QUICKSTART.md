@@ -178,7 +178,9 @@ revision it was green at. That is the event nothing else catches: no test
 failed, no build broke, and the coverage is gone.
 
 Commit `.witnessed/runs.json` so a fresh clone — CI in particular — knows what
-was green before.
+was green before. The revision in that line comes from git, so a folder under
+no version control still reports the regression and still exits 1, but names
+no revision.
 
 ## The gaps as work
 

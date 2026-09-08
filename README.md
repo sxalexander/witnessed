@@ -16,4 +16,9 @@ manifest carries exceptions, never states, so there is no field to type
 Built as a pytest plugin: pytest owns collection, filtering, and outcomes.
 Witnessed owns execution, the run record, the policy, and the grid.
 
+[QUICKSTART.md](QUICKSTART.md) builds a working grid in five minutes.
+[docs/product.md](docs/product.md) is who this is for and what is out of scope.
+[docs/technical.md](docs/technical.md) is the model, the grammar, and every
+decision with its rationale.
+
 Python, pydantic, `uv`.

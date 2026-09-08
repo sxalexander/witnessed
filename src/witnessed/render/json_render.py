@@ -53,6 +53,21 @@ def _cell(cell: CellView) -> dict:
         "state": str(cell.state),
         "reason": cell.reason,
         "regression": cell.regression,
-        "last_witnessed": {"rev": cell.last_witnessed_rev} if cell.last_witnessed_rev else None,
+        "last_witnessed": _last_witnessed(cell),
         "evidence": cell.evidence,
+    }
+
+
+def _last_witnessed(cell) -> dict | None:
+    """A prior observation as a time and, where a repository supplies one, a revision.
+
+    The time is present whenever the cell was ever witnessed; the revision is
+    absent outside version control, so a consumer reads `at` and treats `rev`
+    as an enrichment.
+    """
+    if cell.last_witnessed_at is None and cell.last_witnessed_rev is None:
+        return None
+    return {
+        "at": cell.last_witnessed_at.isoformat() if cell.last_witnessed_at else None,
+        "rev": cell.last_witnessed_rev,
     }

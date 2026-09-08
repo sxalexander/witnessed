@@ -153,19 +153,21 @@ def _regressions(grid: GridView) -> list[str]:
         return []
     width = max(len(cell.id) for cell in regressed)
     return [
-        _line(f"{cell.id.ljust(width)}  regression: last witnessed at {_rev(cell)}")
+        _line(f"{cell.id.ljust(width)}  regression: last witnessed {_when(cell)}")
         for cell in regressed
     ]
 
 
-def _rev(cell: CellView) -> str:
-    """What to diff a regressed cell against, or an account of why there is nothing.
+def _when(cell: CellView) -> str:
+    """When a regressed cell was last true, and what to diff it against.
 
-    A run outside a repository records no revision, so a cell can be a
-    regression with nothing to name. Saying so keeps the line honest rather
-    than printing an empty revision.
+    Every run records a time, so the answer never depends on the corpus being
+    a repository. A revision is appended where one exists, because a
+    maintainer who has one wants to read the range rather than the date.
     """
-    return f"rev {cell.last_witnessed_rev}" if cell.last_witnessed_rev else "an unrecorded revision"
+    moment = cell.last_witnessed_at
+    stamp = moment.date().isoformat() if moment is not None else "at an unrecorded time"
+    return f"{stamp} (rev {cell.last_witnessed_rev})" if cell.last_witnessed_rev else stamp
 
 
 def _widths(grid: GridView) -> tuple[int, list[int]]:

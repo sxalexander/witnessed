@@ -164,7 +164,7 @@ witnessed verify docs.grid.yaml
   usage    +   -
   api      -   ~
 
-  install/es  regression: last witnessed at rev a1b2c3
+  install/es  regression: last witnessed 2026-09-08 (rev a1b2c3)
 ```
 
 ```
@@ -173,14 +173,16 @@ echo $?
 ```
 
 `-*` is a regression, not a gap, and it exits 1 even though the other four
-reds exit 0. The grid remembers that this cell was green and names the
-revision it was green at. That is the event nothing else catches: no test
-failed, no build broke, and the coverage is gone.
+reds exit 0. The grid remembers that this cell was green and says when. That
+is the event nothing else catches: no test failed, no build broke, and the
+coverage is gone.
 
-Commit `.witnessed/runs.json` so a fresh clone — CI in particular — knows what
-was green before. The revision in that line comes from git, so a folder under
-no version control still reports the regression and still exits 1, but names
-no revision.
+The date comes from the run record. The revision beside it comes from version
+control and is an enrichment: a folder that is not a repository prints
+`last witnessed 2026-09-08` and behaves identically.
+
+`.witnessed/runs.json` is a plain file, so nothing here needs git. Commit it if
+you use git, so a fresh clone — CI in particular — knows what was green before.
 
 ## The gaps as work
 

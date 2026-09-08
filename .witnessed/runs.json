@@ -3,7 +3,7 @@
     "quickstart": {
       "close-gap/bare": {
         "current": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -13,10 +13,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -26,12 +26,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "close-gap/node": {
         "current": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -41,10 +41,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -54,12 +54,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "close-gap/python": {
         "current": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -69,10 +69,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -82,12 +82,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "except/bare": {
         "current": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -97,10 +97,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -110,12 +110,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "except/node": {
         "current": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -125,10 +125,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -138,12 +138,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "except/python": {
         "current": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -153,10 +153,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -166,17 +166,14 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "export/bare": {
         "current": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
-              "earlier_steps_unmet": [
-                "regression"
-              ],
               "step": {
                 "first_prompt": [
                   "build a solution for install/es"
@@ -186,15 +183,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
-              "earlier_steps_unmet": [
-                "regression"
-              ],
               "step": {
                 "first_prompt": [
                   "build a solution for install/es"
@@ -204,12 +198,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "export/node": {
         "current": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -221,10 +215,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -236,12 +230,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "export/python": {
         "current": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -253,10 +247,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -268,12 +262,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "first-run/bare": {
         "current": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -287,10 +281,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -304,12 +298,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "first-run/node": {
         "current": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -323,10 +317,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -340,12 +334,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "first-run/python": {
         "current": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -359,10 +353,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -376,12 +370,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "init/bare": {
         "current": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -390,10 +384,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -402,12 +396,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "init/node": {
         "current": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -416,10 +410,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -428,12 +422,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "init/python": {
         "current": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -442,10 +436,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
@@ -454,101 +448,134 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "regression/bare": {
         "current": {
-          "at": "2026-09-08T19:13:55.573397Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
                 "exit": 1,
                 "install/es": "failed",
-                "last_witnessed_rev": null,
-                "printed": "  install/es  regression: last witnessed at an unrecorded revision",
+                "last_witnessed": {
+                  "at": "2026-09-08T19:43:03.305049+00:00",
+                  "rev": null
+                },
+                "printed": "  install/es  regression: last witnessed 2026-09-08",
                 "regression": true
               }
             },
-            "ok": false
+            "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
-        "last_witnessed": null
+        "last_witnessed": {
+          "at": "2026-09-08T19:43:06.504686Z",
+          "result": {
+            "evidence": {
+              "step": {
+                "exit": 1,
+                "install/es": "failed",
+                "last_witnessed": {
+                  "at": "2026-09-08T19:43:03.305049+00:00",
+                  "rev": null
+                },
+                "printed": "  install/es  regression: last witnessed 2026-09-08",
+                "regression": true
+              }
+            },
+            "ok": true
+          },
+          "rev": "7d5dcb4"
+        }
       },
       "regression/node": {
         "current": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
                 "exit": 1,
                 "install/es": "failed",
-                "last_witnessed_rev": "79380a2",
-                "printed": "  install/es  regression: last witnessed at rev 79380a2",
+                "last_witnessed": {
+                  "at": "2026-09-08T19:43:04.103295+00:00",
+                  "rev": "d60d5c5"
+                },
+                "printed": "  install/es  regression: last witnessed 2026-09-08 (rev d60d5c5)",
                 "regression": true
               }
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
                 "exit": 1,
                 "install/es": "failed",
-                "last_witnessed_rev": "79380a2",
-                "printed": "  install/es  regression: last witnessed at rev 79380a2",
+                "last_witnessed": {
+                  "at": "2026-09-08T19:43:04.103295+00:00",
+                  "rev": "d60d5c5"
+                },
+                "printed": "  install/es  regression: last witnessed 2026-09-08 (rev d60d5c5)",
                 "regression": true
               }
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "regression/python": {
         "current": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
                 "exit": 1,
                 "install/es": "failed",
-                "last_witnessed_rev": "553da41",
-                "printed": "  install/es  regression: last witnessed at rev 553da41",
+                "last_witnessed": {
+                  "at": "2026-09-08T19:43:03.378629+00:00",
+                  "rev": "c206692"
+                },
+                "printed": "  install/es  regression: last witnessed 2026-09-08 (rev c206692)",
                 "regression": true
               }
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:15:22.993243Z",
+          "at": "2026-09-08T19:43:06.504686Z",
           "result": {
             "evidence": {
               "step": {
                 "exit": 1,
                 "install/es": "failed",
-                "last_witnessed_rev": "553da41",
-                "printed": "  install/es  regression: last witnessed at rev 553da41",
+                "last_witnessed": {
+                  "at": "2026-09-08T19:43:03.378629+00:00",
+                  "rev": "c206692"
+                },
+                "printed": "  install/es  regression: last witnessed 2026-09-08 (rev c206692)",
                 "regression": true
               }
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       }
     },
     "render": {
       "cell-state/html": {
         "current": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "data_state_values": [
@@ -569,10 +596,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "data_state_values": [
@@ -593,12 +620,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "cell-state/json": {
         "current": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "expected": [
@@ -619,10 +646,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "expected": [
@@ -643,12 +670,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "cell-state/md": {
         "current": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "expected": [
@@ -669,10 +696,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "expected": [
@@ -693,12 +720,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "cell-state/tui": {
         "current": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "expected": 5,
@@ -713,10 +740,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "expected": 5,
@@ -731,12 +758,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "except-reason/html": {
         "current": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "excepted": [
@@ -748,10 +775,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "excepted": [
@@ -763,12 +790,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "except-reason/json": {
         "current": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "excepted": [
@@ -780,10 +807,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "excepted": [
@@ -795,12 +822,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "except-reason/md": {
         "current": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "defined_footnotes": [
@@ -816,10 +843,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "defined_footnotes": [
@@ -835,12 +862,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "gap-policy/html": {
         "current": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "incomplete": [],
@@ -860,10 +887,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "incomplete": [],
@@ -883,12 +910,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "gap-policy/json": {
         "current": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "incomplete": [],
@@ -906,10 +933,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "incomplete": [],
@@ -927,12 +954,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "gap-policy/md": {
         "current": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "policies": {
@@ -950,10 +977,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "policies": {
@@ -971,12 +998,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "gap-policy/tui": {
         "current": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "headers": [
@@ -999,10 +1026,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "headers": [
@@ -1025,12 +1052,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "multi-grid/html": {
         "current": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "sections": [
@@ -1041,10 +1068,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "sections": [
@@ -1055,12 +1082,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "multi-grid/json": {
         "current": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "grids": [
@@ -1071,10 +1098,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "grids": [
@@ -1085,12 +1112,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "multi-grid/md": {
         "current": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "headings": [
@@ -1105,10 +1132,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "headings": [
@@ -1123,12 +1150,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "multi-grid/tui": {
         "current": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "cell_rows_per_grid": [
@@ -1143,10 +1170,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "cell_rows_per_grid": [
@@ -1161,12 +1188,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "regression/html": {
         "current": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "cells": 7,
@@ -1177,14 +1204,17 @@
                 "a1b2c3d"
               ],
               "snapshot": ".witnessed/snap/demo.html",
-              "without_rev": []
+              "times": [
+                "2026-09-01"
+              ],
+              "without_at": []
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "cells": 7,
@@ -1195,46 +1225,49 @@
                 "a1b2c3d"
               ],
               "snapshot": ".witnessed/snap/demo.html",
-              "without_rev": []
+              "times": [
+                "2026-09-01"
+              ],
+              "without_at": []
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "regression/json": {
         "current": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "regressed": [
                 "alpha/a/y"
               ],
               "snapshot": ".witnessed/snap/demo.json",
-              "without_last_witnessed_rev": []
+              "without_last_witnessed_at": []
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "regressed": [
                 "alpha/a/y"
               ],
               "snapshot": ".witnessed/snap/demo.json",
-              "without_last_witnessed_rev": []
+              "without_last_witnessed_at": []
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "regression/md": {
         "current": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "markers": [
@@ -1242,7 +1275,7 @@
               ],
               "markers_that_name_a_state": [],
               "regressed_cells": [
-                "failed, regressed (last witnessed `a1b2c3d`)"
+                "failed, regressed (last witnessed 2026-09-01 `a1b2c3d`)"
               ],
               "snapshot": ".witnessed/snap/demo.md",
               "unmarked_gap_cells": [
@@ -1253,10 +1286,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "markers": [
@@ -1264,7 +1297,7 @@
               ],
               "markers_that_name_a_state": [],
               "regressed_cells": [
-                "failed, regressed (last witnessed `a1b2c3d`)"
+                "failed, regressed (last witnessed 2026-09-01 `a1b2c3d`)"
               ],
               "snapshot": ".witnessed/snap/demo.md",
               "unmarked_gap_cells": [
@@ -1275,12 +1308,12 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       },
       "regression/tui": {
         "current": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "plain_marks": [
@@ -1297,10 +1330,10 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         },
         "last_witnessed": {
-          "at": "2026-09-08T19:14:55.217429Z",
+          "at": "2026-09-08T19:43:06.505023Z",
           "result": {
             "evidence": {
               "plain_marks": [
@@ -1317,7 +1350,7 @@
             },
             "ok": true
           },
-          "rev": "8062773"
+          "rev": "7d5dcb4"
         }
       }
     }

@@ -144,10 +144,17 @@ def _cell(cell: CellView) -> str:
     if cell.regression:
         classes.append("regressed")
         attributes += ' data-regression="true"'
+        said = []
+        if cell.last_witnessed_at is not None:
+            stamp = cell.last_witnessed_at.date().isoformat()
+            attributes += f' data-last-witnessed-at="{escape(stamp, quote=True)}"'
+            said.append(stamp)
         if cell.last_witnessed_rev:
             rev = cell.last_witnessed_rev
             attributes += f' data-last-witnessed-rev="{escape(rev, quote=True)}"'
-            body += f'<span class="rev">last witnessed {escape(rev)}</span>'
+            said.append(rev)
+        if said:
+            body += f'<span class="rev">last witnessed {escape(" ".join(said))}</span>'
     return f'<td class="{escape(" ".join(classes), quote=True)}"{attributes}>{body}</td>'
 
 

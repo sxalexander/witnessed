@@ -11,7 +11,3 @@ policy:
   on_gap: fail
   on_regression: fail
 
-except:
-  regression/bare:
-    why: not-applicable
-    reason: "the step reports the regression and exits 1 here, but the page also promises the revision the cell was last green at, and a folder under no version control has no revisions to name; witnessing this cell would require the folder to be a repository"

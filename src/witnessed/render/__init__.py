@@ -6,13 +6,16 @@ regression, the same reason behind a closed cell. They agree by not deciding —
 already resolved, so a renderer never calls `cell_state`, never unpacks an
 `Observation.result` union, and cannot drift from the precedence the spec sets.
 
-A view is flat where the model is layered. `last_witnessed_rev` is a string or
-nothing, because the revision a cell was last true at is the whole of what a
-render needs from a prior observation; a `last_witnessed` whose `rev` is null
-is therefore indistinguishable from none at all.
+A view is flat where the model is layered. A prior observation reaches a
+render as two fields: `last_witnessed_at`, which every run records, and
+`last_witnessed_rev`, which only a working tree under version control can
+supply. A regression report is built from the timestamp and enriched by the
+revision, never the other way round, so a corpus that is a folder rather than
+a repository still learns when it was last true.
 """
 
 from collections.abc import Iterable, Mapping
+from datetime import datetime
 from dataclasses import dataclass, field
 
 from witnessed.model import (
@@ -48,6 +51,7 @@ class CellView:
     state: CellState
     reason: str | None = None
     regression: bool = False
+    last_witnessed_at: datetime | None = None
     last_witnessed_rev: str | None = None
     evidence: dict = field(default_factory=dict)
 
@@ -106,6 +110,7 @@ def _cell(grid: Grid, dimension: str, variant: str, record: CellRecord | None) -
         state=state,
         reason=closure.reason if closure is not None else None,
         regression=is_regression(state, record),
+        last_witnessed_at=last_witnessed.at if last_witnessed is not None else None,
         last_witnessed_rev=last_witnessed.rev if last_witnessed is not None else None,
         evidence=_evidence(record),
     )

@@ -156,14 +156,14 @@ def step_regression(directory):
     (directory / "docs" / "es" / "install.md").unlink()
     finished = witnessed("verify", "docs.grid.yaml", cwd=directory)
     cell = cells(directory)["install/es"]
-    revision = (cell.get("last_witnessed") or {}).get("rev")
+    prior = cell.get("last_witnessed") or {}
     return (
-        cell["regression"] is True and finished.returncode == 1 and bool(revision)
+        cell["regression"] is True and finished.returncode == 1 and bool(prior.get("at"))
     ), {
         "install/es": cell["state"],
         "regression": cell["regression"],
         "exit": finished.returncode,
-        "last_witnessed_rev": revision,
+        "last_witnessed": prior,
         "printed": finished.stdout.strip().splitlines()[-1] if finished.stdout else "",
     }
 

@@ -100,7 +100,13 @@ def _cell(grid_id: str, cell: CellView) -> str:
         text += f"[^{_label(grid_id, cell)}]"
     if cell.regression:
         text += f", {REGRESSION_MARK}"
-        if cell.last_witnessed_rev:
+        moment = cell.last_witnessed_at
+        stamp = moment.date().isoformat() if moment is not None else None
+        if stamp and cell.last_witnessed_rev:
+            text += f" (last witnessed {stamp} `{cell.last_witnessed_rev}`)"
+        elif stamp:
+            text += f" (last witnessed {stamp})"
+        elif cell.last_witnessed_rev:
             text += f" (last witnessed `{cell.last_witnessed_rev}`)"
     return text
 

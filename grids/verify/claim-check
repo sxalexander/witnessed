@@ -48,7 +48,7 @@ _TUI_HEADER = re.compile(r"(\S+)\s+on_gap:\s*(\S+)\s+on_regression:\s*(\S+)\s*$"
 _MD_HEADING = re.compile(r"^##\s+(\S+)\s*$")
 _MD_FOOTNOTE_REF = re.compile(r"\[\^([^\]]+)\]")
 _MD_STATE_WORD = re.compile(r"^([a-z]+)")
-_MD_REV = re.compile(r"`([0-9A-Za-z][0-9A-Za-z._-]{3,})`")
+_MD_WHEN = re.compile(r"last witnessed (\d{4}-\d{2}-\d{2}|`[^`]+`)")
 _HTML_TD = re.compile(r"<td\b([^>]*)>")
 _HTML_SECTION = re.compile(r"<section\b([^>]*)>")
 _HTML_ATTRIBUTE = re.compile(r'([A-Za-z][A-Za-z0-9-]*)="([^"]*)"')
@@ -185,16 +185,21 @@ def json_except_reason(text: str) -> tuple[bool, dict]:
 
 
 def json_regression(text: str) -> tuple[bool, dict]:
-    """A regressed cell says so, and names the revision it was last true at."""
+    """A regressed cell says so, and says when it was last true.
+
+    The time is what every run records; a revision is an enrichment a corpus
+    outside version control cannot supply, so demanding one here would make
+    the claim untrue of a folder that is not a repository.
+    """
     regressed = [(key, cell) for key, cell in _json_cells(text) if cell.get("regression") is True]
     unnamed = [
         f"{key}/{cell['id']}"
         for key, cell in regressed
-        if not ((cell.get("last_witnessed") or {}).get("rev") or "").strip()
+        if not ((cell.get("last_witnessed") or {}).get("at") or "").strip()
     ]
     return bool(regressed) and not unnamed, {
         "regressed": [f"{key}/{cell['id']}" for key, cell in regressed],
-        "without_last_witnessed_rev": unnamed,
+        "without_last_witnessed_at": unnamed,
     }
 
 
@@ -247,7 +252,7 @@ def md_except_reason(text: str) -> tuple[bool, dict]:
 
 
 def md_regression(text: str) -> tuple[bool, dict]:
-    """A regressed gap opens with a mark no state word spells, and names the rev.
+    """A regressed gap opens with a mark no state word spells, and says when.
 
     The mark is read as the first word a cell shows after its state word, and a
     gap that is not a regression must not carry it: a marker a rollout cell also
@@ -257,7 +262,7 @@ def md_regression(text: str) -> tuple[bool, dict]:
     marked = [(cell, rest) for cell, rest in gaps if rest]
     plain = [cell for cell, rest in gaps if not rest]
     markers = sorted({_leading_word(rest) for _, rest in marked})
-    unnamed = [cell for cell, rest in marked if not _MD_REV.search(rest)]
+    unnamed = [cell for cell, rest in marked if not _MD_WHEN.search(rest)]
     borrowed = sorted(set(markers) & set(STATES))
     leaked = sorted(
         cell
@@ -333,18 +338,23 @@ def html_except_reason(text: str) -> tuple[bool, dict]:
 
 
 def html_regression(text: str) -> tuple[bool, dict]:
-    """A regressed cell carries `data-regression="true"` and the revision."""
+    """A regressed cell carries `data-regression="true"` and when it was last true.
+
+    The time is on every regressed cell; the revision rides beside it only
+    where a repository supplied one, so a consumer queries the time.
+    """
     cells = _html_cells(text)
     regressed = [cell for cell in cells if cell.get("data-regression") == "true"]
     unnamed = [
         cell.get("data-cell")
         for cell in regressed
-        if not cell.get("data-last-witnessed-rev", "").strip()
+        if not cell.get("data-last-witnessed-at", "").strip()
     ]
     return bool(regressed) and not unnamed, {
         "regressed": [cell.get("data-cell") for cell in regressed],
+        "times": [cell.get("data-last-witnessed-at") for cell in regressed],
         "revisions": [cell.get("data-last-witnessed-rev") for cell in regressed],
-        "without_rev": unnamed,
+        "without_at": unnamed,
         "cells": len(cells),
     }
 

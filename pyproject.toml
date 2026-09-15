@@ -3,6 +3,8 @@ name = "witnessed"
 version = "0.1.0"
 description = "Witness grids whose cells are proven by a verifier that ran or closed with a stated reason"
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.11"
 dependencies = [
     "pydantic>=2.10",

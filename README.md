@@ -17,8 +17,17 @@ Built as a pytest plugin: pytest owns collection, filtering, and outcomes.
 Witnessed owns execution, the run record, the policy, and the grid.
 
 [QUICKSTART.md](QUICKSTART.md) builds a working grid in five minutes.
-[docs/product.md](docs/product.md) is who this is for and what is out of scope.
-[docs/technical.md](docs/technical.md) is the model, the grammar, and every
-decision with its rationale.
+
+## Not in scope
+
+- Run history beyond each cell's current observation and its last witnessed one.
+- Comparing evidence across runs to catch depth thinning before a threshold.
+- Receiving a status from outside a verifier run: manual records, attestations,
+  human sign-off.
+- Grids with more than two axes, and references between grids. A third axis is
+  a second grid.
+- An interactive TUI.
+- Domain-specific integrations. A corpus is a file tree and a verifier is a
+  command over it.
 
 Python, pydantic, `uv`.

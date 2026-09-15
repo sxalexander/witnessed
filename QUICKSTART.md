@@ -225,6 +225,4 @@ verifiers.
   `<grid>::<dimension>::<variant>`, and a project's own `pytest` run never
   touches grids.
 
-[docs/product.md](docs/product.md) is who this is for and what is out of
-scope. [docs/technical.md](docs/technical.md) is the model, the grammar, and
-every decision with its rationale.
+[README.md](README.md#not-in-scope) lists what is out of scope.

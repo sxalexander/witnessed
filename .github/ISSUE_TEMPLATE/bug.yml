@@ -1,5 +1,5 @@
 name: Bug
-description: Witnessed did something other than what QUICKSTART.md or docs/technical.md says it does.
+description: Witnessed did something other than what QUICKSTART.md says it does.
 labels: [bug]
 body:
   - type: input
@@ -29,6 +29,6 @@ body:
     id: expected
     attributes:
       label: Expected
-      description: What should have happened, and where the documentation says so.
+      description: What should have happened, and where QUICKSTART.md says so.
     validations:
       required: true

@@ -21,5 +21,5 @@ body:
     attributes:
       label: Scope
       options:
-        - label: I have read the scope boundaries in docs/product.md and this is not listed as out of scope.
+        - label: I have read "Not in scope" in README.md and this is not listed as out of scope.
           required: true

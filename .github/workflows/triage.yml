@@ -31,4 +31,4 @@ jobs:
             7 days. Any comment resets the clock. See CONTRIBUTING.md.
           close-issue-message: >
             Closed as not planned: not approved within 30 days. This holds the
-            scope boundary in docs/product.md and is not a judgement of the idea.
+            scope boundary in README.md and is not a judgement of the idea.

@@ -8,7 +8,7 @@ to, and so that nothing waits on a person except a security report.
 
 Open an issue with one of the two forms: **Bug** or **Proposal**. Blank issues
 are disabled, and questions are not answered in issues;
-[QUICKSTART.md](QUICKSTART.md) and [docs/](docs/) are the support surface.
+[QUICKSTART.md](QUICKSTART.md) and [README.md](README.md) are the support surface.
 
 Issues are triaged weekly. Triage ends one of two ways:
 
@@ -17,7 +17,7 @@ Issues are triaged weekly. Triage ends one of two ways:
 
 An issue that has not been approved 30 days after its last activity is closed
 automatically as not planned. That closure is the scope boundary being held,
-not a judgement of the idea; [docs/product.md](docs/product.md) states what is
+not a judgement of the idea; [README.md](README.md#not-in-scope) states what is
 out of scope.
 
 ## Pull requests
@@ -37,8 +37,8 @@ A pull request is ready for review when:
 
 - `uv run pytest` passes
 - `uv run witnessed verify grids/` exits 0
-- a change to documented behaviour changes [QUICKSTART.md](QUICKSTART.md) or
-  [docs/technical.md](docs/technical.md) in the same pull request
+- a change to documented behaviour changes [QUICKSTART.md](QUICKSTART.md) in
+  the same pull request
 
 ## Compatibility
 

@@ -1,0 +1,67 @@
+name: Pull request gate
+
+# A pull request from outside the maintainers must close an issue labelled
+# `approved` (CONTRIBUTING.md). Anything else is closed with an explanation, and
+# reopened when its description is edited to reference an approved issue.
+#
+# pull_request_target runs this file from the default branch with a writable
+# token, and runs for first-time contributors without approval. It is safe only
+# because nothing from the pull request is checked out or executed: the body is
+# read as data through the API.
+
+on:
+  pull_request_target:
+    types: [opened, reopened, edited]
+
+permissions: {}
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const trusted = ["OWNER", "MEMBER", "COLLABORATOR"];
+            if (trusted.includes(pr.author_association) || pr.user.type === "Bot") return;
+
+            const { owner, repo } = context.repo;
+            const closing = /\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s*:?\s*#(\d+)\b/gi;
+            const numbers = [...new Set([...(pr.body || "").matchAll(closing)].map((m) => Number(m[1])))];
+
+            let approved = false;
+            for (const issue_number of numbers) {
+              const { data: issue } = await github.rest.issues.get({ owner, repo, issue_number })
+                .catch(() => ({ data: null }));
+              if (!issue || issue.pull_request || issue.state !== "open") continue;
+              if (issue.labels.some((label) => (label.name ?? label) === "approved")) {
+                approved = true;
+                break;
+              }
+            }
+
+            if (approved) {
+              if (pr.state === "closed" && !pr.merged) {
+                await github.rest.pulls.update({ owner, repo, pull_number: pr.number, state: "open" });
+              }
+              return;
+            }
+            if (pr.state === "closed") return;
+
+            await github.rest.issues.createComment({
+              owner, repo, issue_number: pr.number,
+              body: [
+                `Thanks for this. Pull requests here must close an issue labelled \`approved\`, so review time goes only to agreed work ([CONTRIBUTING.md](https://github.com/${owner}/${repo}/blob/HEAD/CONTRIBUTING.md#pull-requests)).`,
+                "",
+                numbers.length
+                  ? `None of the referenced issues (${numbers.map((n) => "#" + n).join(", ")}) is open and approved.`
+                  : "The description does not close any issue.",
+                "",
+                "Open or find an issue, wait for the `approved` label, then edit this description to say `Closes #<number>`. The pull request reopens itself.",
+              ].join("\n"),
+            });
+            await github.rest.pulls.update({ owner, repo, pull_number: pr.number, state: "closed" });

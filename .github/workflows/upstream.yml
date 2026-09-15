@@ -1,0 +1,53 @@
+name: Upstream pre-releases
+
+# Upstream breakage arrives as a scheduled issue rather than as a failed
+# release. One open upstream-break issue collects every failing run.
+
+on:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prerelease:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.14", "3.15"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        with:
+          python-version: ${{ matrix.python }}
+      - run: uv sync --upgrade --prerelease allow
+      - run: uv run --no-sync pytest -q
+      - run: uv run --no-sync witnessed verify grids/
+
+  report:
+    needs: prerelease
+    if: failure()
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - run: |
+          gh label create upstream-break --color B60205 --force \
+            --description "An upstream pre-release breaks Witnessed"
+          open=$(gh issue list --label upstream-break --state open --json number --jq '.[0].number')
+          if [ -n "$open" ]; then
+            gh issue comment "$open" --body "Still failing: $RUN_URL"
+          else
+            gh issue create --label upstream-break \
+              --title "An upstream pre-release breaks Witnessed" \
+              --body "The weekly run against upstream pre-releases failed: $RUN_URL"
+          fi

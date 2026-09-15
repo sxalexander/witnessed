@@ -1,0 +1,34 @@
+name: Bug
+description: Witnessed did something other than what QUICKSTART.md or docs/technical.md says it does.
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Witnessed version
+      description: Output of `witnessed --version`. Only the latest release is supported.
+    validations:
+      required: true
+  - type: textarea
+    id: manifest
+    attributes:
+      label: Manifest
+      description: The smallest `*.grid.yaml` that reproduces the problem.
+      render: yaml
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command and output
+      description: The exact command, its full output, and its exit code (`echo $?`).
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected
+      description: What should have happened, and where the documentation says so.
+    validations:
+      required: true

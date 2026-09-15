@@ -3,11 +3,11 @@ name = "witnessed"
 version = "0.1.0"
 description = "Witness grids whose cells are proven by a verifier that ran or closed with a stated reason"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 dependencies = [
-    "pydantic>=2",
-    "pyyaml",
-    "pytest>=8",
+    "pydantic>=2.10",
+    "pyyaml>=6.0.2",
+    "pytest>=8.4",
 ]
 
 [project.scripts]

@@ -1,0 +1,25 @@
+name: Proposal
+description: A change to what Witnessed does. A pull request is welcome only once the proposal is approved.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What you are trying to prove about your project, and where Witnessed stops you. Describe the grid, not the implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: today
+    attributes:
+      label: What you do today
+      description: The workaround, and what it costs.
+    validations:
+      required: true
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope
+      options:
+        - label: I have read the scope boundaries in docs/product.md and this is not listed as out of scope.
+          required: true

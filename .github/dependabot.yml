@@ -1,0 +1,25 @@
+# One grouped pull request per ecosystem per week, merged automatically when CI
+# passes (workflows/dependabot-automerge.yml). The cooldown keeps a release that
+# is yanked within a week from ever reaching the lockfile. Security updates
+# ignore both the schedule and the cooldown.
+version: 2
+updates:
+  - package-ecosystem: uv
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      python:
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ["*"]

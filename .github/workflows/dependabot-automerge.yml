@@ -1,0 +1,22 @@
+name: Dependabot auto-merge
+
+# Queues Dependabot's grouped pull requests to merge once required checks pass.
+# Merging waits on the repository's required status checks; without them,
+# auto-merge has nothing to wait for.
+
+on: pull_request
+
+permissions: {}
+
+jobs:
+  automerge:
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ github.token }}

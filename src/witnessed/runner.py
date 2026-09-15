@@ -201,6 +201,16 @@ async def _run_shell(command: str, cwd: Path, timeout: float) -> _Completed:
 
     `communicate()` rather than a read loop, because a verifier that fills a
     pipe deadlocks against anything that waits for it to exit first.
+
+    The command runs in its own session, so an interrupt at the terminal never
+    reaches it. A cancelled run therefore kills the group itself before the
+    cancellation propagates; otherwise every verifier in flight outlives the
+    run that started it.
+
+    `asyncio.timeout()` rather than `asyncio.wait_for()`: before Python 3.12,
+    `wait_for` can swallow a cancellation that arrives as the awaited call
+    completes (CPython gh-86296), which would turn an interrupt into a finished
+    cell.
     """
     try:
         process = await asyncio.create_subprocess_shell(
@@ -214,12 +224,16 @@ async def _run_shell(command: str, cwd: Path, timeout: float) -> _Completed:
         return _Completed(None, "", "", f"could not be started: {exc}")
 
     try:
-        stdout, stderr = await asyncio.wait_for(process.communicate(), timeout)
+        async with asyncio.timeout(timeout):
+            stdout, stderr = await process.communicate()
     except TimeoutError:
         _kill_group(process)
         with contextlib.suppress(Exception):
             await process.wait()
         return _Completed(None, "", "", f"exceeded {timeout:g}s and was killed")
+    except asyncio.CancelledError:
+        _kill_group(process)
+        raise
 
     return _Completed(process.returncode, _text(stdout), _text(stderr), None)
 

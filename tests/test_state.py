@@ -277,3 +277,15 @@ def git(*arguments: str) -> subprocess.CompletedProcess[str]:
         check=True,
         env=environment,
     )
+
+
+def test_a_conflicted_file_names_the_conflict(tmp_path: Path):
+    state.run_file_path(tmp_path).write_text("<<<<<<< HEAD\n{}\n=======\n{}\n>>>>>>> theirs\n")
+    with pytest.raises(ValueError, match="unresolved merge conflict markers"):
+        state.load(tmp_path)
+
+
+def test_an_invalid_file_names_what_is_wrong_without_a_traceback_frame(tmp_path: Path):
+    state.run_file_path(tmp_path).write_text('{"grids": {}}')
+    with pytest.raises(ValueError, match=r"is not a valid run file:\n  witnessed: Field required"):
+        state.load(tmp_path)

@@ -15,6 +15,11 @@ Prose does not fit in a table cell, so a closed cell carries a footnote
 reference and its reason is the footnote text. Definitions are written under
 their own grid's table rather than gathered at the end of the document, so one
 grid is one block that survives being quoted on its own.
+
+A claim and a reason are text, never markup. Both come from manifests and
+verifiers, and a document pasted into a review is rendered by whatever reads
+it, so raw HTML, a link, or a footnote reference inside them is written out as
+the characters it is made of.
 """
 
 from collections.abc import Sequence
@@ -45,7 +50,7 @@ def _grid(grid: GridView) -> str:
     cell means different things in two grids: a reader who has found the grid
     has found what its red costs, without scrolling to a legend.
     """
-    blocks = [f"## {grid.id}\n{_policy(grid)}", grid.claim, _table(grid)]
+    blocks = [f"## {grid.id}\n{_policy(grid)}", _literal(grid.claim), _table(grid)]
     footnotes = _footnotes(grid)
     if footnotes:
         blocks.append(footnotes)
@@ -120,7 +125,7 @@ def _footnotes(grid: GridView) -> str:
     reader following the reference does not need to.
     """
     return "\n".join(
-        f"[^{_label(grid.id, cell)}]: {_flat(cell.reason)}" for cell in grid.cells if cell.reason
+        f"[^{_label(grid.id, cell)}]: {_literal(cell.reason)}" for cell in grid.cells if cell.reason
     )
 
 
@@ -128,21 +133,28 @@ def _label(grid_id: str, cell: CellView) -> str:
     """A footnote's name: the cell's address, in the characters a label may hold.
 
     Definitions from every grid share one namespace once the document is
-    rendered, so the grid id is part of the name. Coordinates are joined with
-    `-` rather than the `/` a cell is otherwise spelled with, to stay inside the
-    characters every markdown implementation accepts in a label.
+    rendered, so the grid id is part of the name. Parts are joined with `_`,
+    which no id may contain, so two cells can never share a label: joined with
+    `-`, cells `a-b/c` and `a/b-c` would both be `a-b-c`. `_` also stays inside
+    the characters every markdown implementation accepts in a label.
     """
-    return f"{grid_id}-{cell.dimension}-{cell.variant}"
+    return f"{grid_id}_{cell.dimension}_{cell.variant}"
 
 
-def _flat(reason: str) -> str:
-    """A reason as one line.
+_LITERAL = str.maketrans(
+    {"&": "&amp;", "<": "&lt;", ">": "&gt;", "[": "\\[", "]": "\\]", "\\": "\\\\"}
+)
 
-    A footnote definition ends at its first unindented newline, so a reason
-    written across several lines would render with its tail orphaned outside
-    the footnote.
+
+def _literal(text: str) -> str:
+    """Prose as one line of text that no markdown renderer reads as markup.
+
+    `<`, `>` and `&` become entities, so raw HTML and autolinks render as
+    characters; `[`, `]` and `\\` are backslash-escaped, so no link or footnote
+    reference can form. A footnote definition ends at its first unindented
+    newline, so whitespace is also collapsed onto one line.
     """
-    return " ".join(reason.split())
+    return " ".join(text.split()).translate(_LITERAL)
 
 
 def _row(cells: Sequence[str]) -> str:

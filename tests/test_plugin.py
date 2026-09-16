@@ -299,3 +299,115 @@ def test_an_expired_verifier_reads_errored(pytester: pytest.Pytester) -> None:
     failed = [report for report in reports(result) if report.failed]
     assert ("witnessed", "errored") in failed[0].user_properties
     assert "killed" in str(failed[0].longrepr)
+
+
+SELECTABLE = """\
+witnessed: 1
+id: {id}
+claim: "a selection names grids and cells exactly"
+dimensions: [a, b]
+variants: [x]
+verify: |-
+  touch ran-{id}-{{dimension}}-{{variant}} && echo '{{"ok": true}}'
+"""
+
+
+def selectable(pytester: pytest.Pytester, *grid_ids: str) -> list[str]:
+    """One manifest per id, each verifier leaving a file behind for every cell it ran."""
+    for grid_id in grid_ids:
+        (pytester.path / f"{grid_id}.grid.yaml").write_text(
+            SELECTABLE.format(id=grid_id), encoding="utf-8"
+        )
+    return [
+        *ISOLATION,
+        "--witnessed-state-dir",
+        str(pytester.path / ".witnessed"),
+        str(pytester.path),
+    ]
+
+
+def ran(pytester: pytest.Pytester) -> list[str]:
+    return sorted(path.name for path in pytester.path.glob("ran-*"))
+
+
+def test_a_grid_selection_is_exact_rather_than_a_substring(pytester: pytest.Pytester) -> None:
+    """`docs` does not select `api-docs`, as `-k docs::` would."""
+    arguments = selectable(pytester, "docs", "api-docs")
+    result = pytester.runpytest_inprocess("--witnessed-grid", "docs", *arguments)
+    assert result.ret == pytest.ExitCode.OK
+    assert ran(pytester) == ["ran-docs-a-x", "ran-docs-b-x"]
+
+
+def test_several_cell_selections_select_their_union(pytester: pytest.Pytester) -> None:
+    arguments = selectable(pytester, "docs", "api-docs")
+    pytester.runpytest_inprocess(
+        "--witnessed-cell", "docs/a/x", "--witnessed-cell", "api-docs/b/x", *arguments
+    )
+    assert ran(pytester) == ["ran-api-docs-b-x", "ran-docs-a-x"]
+
+
+@pytest.mark.parametrize(
+    "selection, message",
+    [
+        (
+            ("--witnessed-grid", "doc"),
+            "*--grid `doc` names no collected grid (found: api-docs, docs)*",
+        ),
+        (("--witnessed-cell", "docs/a/y"), "*--cell `docs/a/y` names no cell of a collected grid*"),
+        (
+            ("--witnessed-cell", "docs/a"),
+            "*--cell takes <grid>/<dimension>/<variant>, not `docs/a`*",
+        ),
+        (("-k", "nothing-by-this-name"), "*the selection matched no cell*"),
+    ],
+)
+def test_a_selection_that_names_nothing_is_a_usage_error(
+    pytester: pytest.Pytester, selection: tuple[str, str], message: str
+) -> None:
+    """A misspelled filter that verified nothing must not pass a gate."""
+    arguments = selectable(pytester, "docs", "api-docs")
+    result = pytester.runpytest_inprocess(*selection, *arguments)
+    assert result.ret == pytest.ExitCode.USAGE_ERROR
+    result.stderr.fnmatch_lines([message])
+    assert ran(pytester) == []
+    assert not (pytester.path / ".witnessed").exists()
+
+
+def test_a_path_holding_no_manifest_is_a_usage_error(pytester: pytest.Pytester) -> None:
+    """A deleted or misplaced grid is a question asked of nothing, not a green run."""
+    result = pytester.runpytest_inprocess(
+        *ISOLATION, "--witnessed-state-dir", str(pytester.path / ".witnessed"), str(pytester.path)
+    )
+    assert result.ret == pytest.ExitCode.USAGE_ERROR
+    result.stderr.fnmatch_lines(["*no *.grid.yaml found under*"])
+
+
+def test_an_unreadable_run_file_stops_the_run_before_any_verifier(
+    pytester: pytest.Pytester,
+) -> None:
+    """The records are the regression evidence, so they are checked before cells are spent."""
+    arguments = selectable(pytester, "docs")
+    run_file = pytester.path / ".witnessed" / "runs.json"
+    run_file.parent.mkdir()
+    conflicted = "<<<<<<< HEAD\n{}\n=======\n{}\n>>>>>>> theirs\n"
+    run_file.write_text(conflicted, encoding="utf-8")
+
+    result = pytester.runpytest_inprocess(*arguments)
+
+    assert result.ret == pytest.ExitCode.USAGE_ERROR
+    result.stderr.fnmatch_lines(["*has unresolved merge conflict markers*"])
+    assert ran(pytester) == []
+    assert run_file.read_text(encoding="utf-8") == conflicted
+
+
+def test_a_manifest_that_does_not_load_stops_every_grid_before_any_verifier(
+    pytester: pytest.Pytester,
+) -> None:
+    """A run that will exit as a usage error has no business spending verifiers first."""
+    arguments = selectable(pytester, "docs")
+    (pytester.path / "broken.grid.yaml").write_text(
+        "witnessed: 1\nid: Not Valid\n", encoding="utf-8"
+    )
+    result = pytester.runpytest_inprocess(*arguments)
+    assert result.ret == pytest.ExitCode.USAGE_ERROR
+    assert ran(pytester) == []

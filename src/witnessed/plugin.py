@@ -22,6 +22,7 @@ import os
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import NoReturn
 
 import pytest
 
@@ -53,6 +54,13 @@ _DECLARED_IDS = pytest.StashKey[dict[str, Path]]()
 
 Two manifests declaring one id would key one grid's records against the other's
 cells, so the second is a collection error rather than a silent overwrite.
+"""
+
+_DECLARED_GRIDS = pytest.StashKey[dict[str, Grid]]()
+"""Every grid the session collected, by id, whether or not a cell of it is selected.
+
+A `--grid` or `--cell` that names nothing is a usage error rather than an empty
+run, and telling the two apart needs the grids a selection could have named.
 """
 
 OUTCOME = pytest.StashKey[Outcome]()
@@ -103,6 +111,22 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         metavar="SECONDS",
         help="seconds one verifier may run before it is killed and its cell reads errored",
     )
+    group.addoption(
+        "--witnessed-grid",
+        dest="witnessed_grids",
+        action="append",
+        default=[],
+        metavar="ID",
+        help="select every cell of this grid; repeatable",
+    )
+    group.addoption(
+        "--witnessed-cell",
+        dest="witnessed_cells",
+        action="append",
+        default=[],
+        metavar="GRID/DIMENSION/VARIANT",
+        help="select this cell; repeatable",
+    )
 
 
 @pytest.hookimpl(trylast=True)
@@ -150,6 +174,7 @@ class GridFile(pytest.File):
                 f"grid id `{grid.id}` is declared by both {claimed_by} and {self.path}"
             )
         declared[grid.id] = self.path
+        self.session.stash.setdefault(_DECLARED_GRIDS, {})[grid.id] = grid
 
         for dimension, variant in grid.cells():
             item = CellItem.from_parent(
@@ -257,6 +282,7 @@ class WitnessedRunner:
         self.config = config
         self.grids: dict[str, _GridRun] = {}
         self.collect_failed = False
+        self.refused = False
         self.verified = False
 
     def pytest_collectreport(self, report: pytest.CollectReport) -> None:
@@ -272,21 +298,82 @@ class WitnessedRunner:
         self._uncaptured()
         print(report.longrepr, file=sys.stderr)
 
+    def pytest_collection_modifyitems(
+        self, session: pytest.Session, config: pytest.Config, items: list[pytest.Item]
+    ) -> None:
+        """Select by grid id and by coordinate exactly, never by substring.
+
+        `-k` matches a substring of a node id, so `-k docs::` also selects a grid
+        named `api-docs`. `--witnessed-grid` and `--witnessed-cell` compare whole
+        names instead, and a name that matches nothing collected is a usage
+        error: a typo that selected no cell would otherwise report success
+        having verified nothing. Several names select their union; `-k`
+        narrows that union further.
+        """
+        grids = config.getoption("witnessed_grids")
+        cells = config.getoption("witnessed_cells")
+        if self.collect_failed or not (grids or cells):
+            return
+
+        known = session.stash.get(_DECLARED_GRIDS, {})
+        found = ", ".join(sorted(known)) or "none"
+        for grid_id in grids:
+            if grid_id not in known:
+                self._refuse(f"--grid `{grid_id}` names no collected grid (found: {found})")
+
+        chosen: set[tuple[str, str, str]] = set()
+        for spelled in cells:
+            parts = spelled.split("/")
+            if len(parts) != 3:
+                self._refuse(f"--cell takes <grid>/<dimension>/<variant>, not `{spelled}`")
+            grid_id, dimension, variant = parts
+            grid = known.get(grid_id)
+            if grid is None or dimension not in grid.dimensions or variant not in grid.variants:
+                self._refuse(f"--cell `{spelled}` names no cell of a collected grid")
+            chosen.add((grid_id, dimension, variant))
+
+        selected: list[pytest.Item] = []
+        deselected: list[pytest.Item] = []
+        for item in items:
+            wanted = isinstance(item, CellItem) and (
+                item.grid.id in grids or (item.grid.id, item.dimension, item.variant) in chosen
+            )
+            (selected if wanted else deselected).append(item)
+        if deselected:
+            config.hook.pytest_deselected(items=deselected)
+            items[:] = selected
+
     def pytest_collection_finish(self, session: pytest.Session) -> None:
         """Run every selected cell, once, before the report loop begins.
 
-        `-k` has already filtered `session.items`, so a selection costs only
-        the cells it names, and the records of the cells it does not name are
+        Selection has already filtered `session.items`, so a run costs only the
+        cells it names, and the records of the cells it does not name are
         neither read nor written.
+
+        A run that would verify nothing is refused rather than reported as
+        success. No manifest under the given paths, or a selection that matched
+        no cell, means the question asked was not the one intended, and exit 0
+        would let a deleted grid or a misspelled filter pass a gate unnoticed.
+        A run file that cannot be read is refused before any verifier starts,
+        because the records it holds are what a regression is detected from.
         """
+        if self.collect_failed or self.refused:
+            return
         items = [item for item in session.items if isinstance(item, CellItem)]
         if self.config.option.collectonly:
             self._uncaptured()
             for item in items:
                 print(item.nodeid)
             return
+        if not session.stash.get(_DECLARED_GRIDS, {}):
+            paths = " ".join(self.config.args) or str(self.config.rootpath)
+            self._refuse(f"no *{MANIFEST_SUFFIX} found under {paths}")
         if not items:
-            return
+            self._refuse("the selection matched no cell")
+        try:
+            state.load(state_dir(self.config))
+        except ValueError as exc:
+            self._refuse(str(exc))
 
         for item in items:
             run = self.grids.get(item.grid.id)
@@ -348,11 +435,10 @@ class WitnessedRunner:
         ):
             return
         if not self.verified:
-            session.exitstatus = _satisfied(exitstatus)
             return
 
         records = self._record()
-        session.exitstatus = _satisfied(
+        session.exitstatus = (
             pytest.ExitCode.TESTS_FAILED if self._breached(records) else pytest.ExitCode.OK
         )
         self._print(records)
@@ -424,6 +510,16 @@ class WitnessedRunner:
         self._uncaptured()
         print(render_view(build_view([run.grid for run in self.grids.values()], records), "tui"))
 
+    def _refuse(self, message: str) -> NoReturn:
+        """End the session as a usage error before any verifier runs.
+
+        pytest calls `pytest_collection_finish` from a `finally` block, so an
+        error raised while selecting still reaches it; the flag is what keeps
+        that call from verifying the cells of a run that has already failed.
+        """
+        self.refused = True
+        raise pytest.UsageError(message)
+
     def _uncaptured(self) -> None:
         """Give the terminal back before writing to it.
 
@@ -451,18 +547,6 @@ def state_dir(config: pytest.Config) -> Path:
     if from_environment:
         return Path(from_environment).expanduser().resolve()
     return Path(config.rootpath) / ".witnessed"
-
-
-def _satisfied(exitstatus: int) -> int:
-    """pytest's seven exit codes narrowed to the four `verify` exposes.
-
-    `NO_TESTS_COLLECTED` becomes success: a grid whose every cell is excepted
-    is a valid grid with nothing to run, and a path that holds no manifest is
-    a question with the answer nothing rather than an error.
-    """
-    if exitstatus == pytest.ExitCode.NO_TESTS_COLLECTED:
-        return pytest.ExitCode.OK
-    return exitstatus
 
 
 def _node_id(grid_id: str, dimension: str, variant: str) -> str:

@@ -31,7 +31,6 @@ import pytest
 
 from pydantic import ValidationError
 
-from witnessed import manifest
 from witnessed import manifest as manifest_module
 from witnessed import state
 from witnessed.model import Grid, is_gap
@@ -116,7 +115,7 @@ def load_grids(paths: Sequence[str] | None) -> list[tuple[Grid, Path]]:
     loaded: list[tuple[Grid, Path]] = []
     declared: dict[str, Path] = {}
     for path in discover(paths):
-        grid = manifest.load(path)
+        grid = manifest_module.load(path)
         claimed_by = declared.get(grid.id)
         if claimed_by is not None:
             raise ValueError(f"grid id `{grid.id}` is declared by both {claimed_by} and {path}")
@@ -147,12 +146,6 @@ def _verify(arguments: argparse.Namespace) -> int:
     that a bare `witnessed verify` in a repository collects that repository's
     grids and not its unit tests.
     """
-    try:
-        selection = _selection(arguments)
-    except ValueError as exc:
-        print(exc, file=sys.stderr)
-        return int(pytest.ExitCode.USAGE_ERROR)
-
     with tempfile.TemporaryDirectory(prefix="witnessed-session-") as scratch:
         configuration = Path(scratch) / "pytest.ini"
         configuration.write_text("[pytest]\n", encoding="utf-8")
@@ -175,8 +168,12 @@ def _verify(arguments: argparse.Namespace) -> int:
             "--witnessed-timeout",
             str(arguments.timeout),
         ]
-        if selection:
-            session += ["-k", selection]
+        if arguments.k:
+            session += ["-k", arguments.k]
+        for grid_id in arguments.grid or []:
+            session += ["--witnessed-grid", grid_id]
+        for cell in arguments.cell or []:
+            session += ["--witnessed-cell", cell]
         session += [str(path) for path in (arguments.paths or [Path.cwd()])]
         return int(pytest.main(session))
 
@@ -185,10 +182,10 @@ def _check(arguments: argparse.Namespace) -> int:
     """Render what is already known. No verifier runs."""
     try:
         grids = load_grids(arguments.paths)
+        records = state.load(state_directory(arguments.state_dir))
     except ValueError as exc:
         print(exc, file=sys.stderr)
         return int(pytest.ExitCode.USAGE_ERROR)
-    records = state.load(state_directory(arguments.state_dir))
     print(render_view(build_view([grid for grid, _ in grids], records), arguments.target))
     return int(pytest.ExitCode.OK)
 
@@ -202,12 +199,12 @@ def _gap(arguments: argparse.Namespace) -> int:
     try:
         grids = load_grids(arguments.paths)
         templates = {grid.id: _template(grid, directory) for grid, directory in grids}
+        records = state.load(state_directory(arguments.state_dir))
     except ValueError as exc:
         print(exc, file=sys.stderr)
         return int(pytest.ExitCode.USAGE_ERROR)
 
     claims = {grid.id: grid.claim for grid, _ in grids}
-    records = state.load(state_directory(arguments.state_dir))
 
     for view in build_view([grid for grid, _ in grids], records):
         for cell in view.cells:
@@ -385,27 +382,6 @@ def _fill(template: str, record: dict) -> str:
     return filled
 
 
-def _selection(arguments: argparse.Namespace) -> str:
-    """`-k`, `--grid` and `--cell` as one pytest expression.
-
-    `--grid` and `--cell` are spellings of `-k` over the node id, so a grid or
-    a cell is named the same way on the command line, in the render, and in the
-    run file. Several are combined with `and`, which is what makes `--grid x -k
-    vue` narrow rather than replace.
-    """
-    expressions: list[str] = []
-    if arguments.k:
-        expressions.append(f"({arguments.k})")
-    if arguments.grid:
-        expressions.append(f"{arguments.grid}::")
-    for cell in arguments.cell or []:
-        parts = cell.split("/")
-        if len(parts) != 3:
-            raise ValueError(f"--cell takes <grid>/<dimension>/<variant>, not `{cell}`")
-        expressions.append("::".join(parts))
-    return " and ".join(expressions)
-
-
 def _walk(root: Path) -> Iterator[Path]:
     for entry in sorted(root.iterdir()):
         if entry.is_dir():
@@ -470,9 +446,11 @@ def _parser() -> argparse.ArgumentParser:
     verify = commands.add_parser("verify", help="run every selected cell's verifier")
     verify.add_argument("paths", nargs="*", metavar="PATH")
     verify.add_argument("-k", dest="k", metavar="EXPR", help="pytest expression over node ids")
-    verify.add_argument("--grid", metavar="ID", help="restrict the run to one grid")
     verify.add_argument(
-        "--cell", action="append", metavar="GRID/DIM/VAR", help="restrict the run to one cell"
+        "--grid", action="append", metavar="ID", help="select every cell of a grid; repeatable"
+    )
+    verify.add_argument(
+        "--cell", action="append", metavar="GRID/DIM/VAR", help="select one cell; repeatable"
     )
     verify.add_argument(
         "-n",

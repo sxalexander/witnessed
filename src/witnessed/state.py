@@ -3,8 +3,8 @@
 `.witnessed/runs.json` is committed, so a fresh clone — CI in particular — can
 tell a cell that was never witnessed from one that was and no longer is. Two
 observations per cell are enough for that distinction and nothing appends, so
-the file stays bounded and needs no merge driver: on a conflict either side is
-correct enough, because re-running `verify` replaces both.
+the file stays bounded and needs no merge driver: a conflict is resolved by
+keeping either side whole, because re-running `verify` replaces both.
 
 Three properties are structural here rather than conventional. A record reaches
 `last_witnessed` only through a `Verdict` with `ok=True`, so the file cannot be
@@ -23,7 +23,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from witnessed.model import (
     CellRecord,
@@ -73,13 +73,28 @@ def load(state_dir: Path | str) -> RunData:
 
     An absent file is the unknown state, not an error: a fresh clone has learned
     nothing about any cell and therefore has no gaps. A file that exists but does
-    not parse raises, because discarding unreadable records would erase exactly
-    the evidence a regression is detected from.
+    not parse raises a `ValueError` a person can act on, because discarding
+    unreadable records would erase exactly the evidence a regression is detected
+    from. The file is committed, so the likeliest cause is a merge left
+    unresolved, and that cause is named when its markers are present.
     """
     path = run_file_path(state_dir)
     if not path.exists():
         return {}
-    return RunFile.model_validate_json(path.read_text(encoding="utf-8")).grids
+    text = path.read_text(encoding="utf-8")
+    try:
+        return RunFile.model_validate_json(text).grids
+    except ValidationError as exc:
+        if any(line.startswith(("<<<<<<< ", ">>>>>>> ")) for line in text.splitlines()):
+            raise ValueError(
+                f"{path} has unresolved merge conflict markers. Keep either side whole "
+                "and run `witnessed verify` to record every cell again."
+            ) from exc
+        problems = "\n".join(
+            f"  {'.'.join(str(part) for part in error['loc']) or '(document)'}: {error['msg']}"
+            for error in exc.errors()[:5]
+        )
+        raise ValueError(f"{path} is not a valid run file:\n{problems}") from exc
 
 
 def merge(

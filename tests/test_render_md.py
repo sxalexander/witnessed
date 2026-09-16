@@ -175,3 +175,39 @@ def test_the_same_inputs_render_identically(document):
         (FIXTURE / "seed-runs.json").read_text(encoding="utf-8")
     ).grids
     assert render(build_view(grids, records)) == document
+
+
+def _hostile() -> str:
+    grid = manifest.Grid.model_validate(
+        {
+            "witnessed": 1,
+            "id": "docs",
+            "claim": "claims <b>markup</b> [a](javascript:alert(1))\n# and a heading",
+            "dimensions": ["a-b", "a"],
+            "variants": ["c", "b-c"],
+            "verify": "true",
+            "except": {
+                "a-b/c": {"why": "unimplemented", "reason": "first <img src=x onerror=alert(1)>"},
+                "a/b-c": {"why": "unimplemented", "reason": "second [^docs_a-b_c]"},
+            },
+        }
+    )
+    return render(build_view([grid], {}))
+
+
+def test_a_claim_and_a_reason_are_written_as_text_never_as_markup():
+    """Prose from a manifest cannot inject HTML, a link, or a footnote reference."""
+    document = _hostile()
+    assert "<" not in document and ">" not in document
+    assert "](javascript:" not in document.replace("\\]", "")
+    assert (
+        "claims &lt;b&gt;markup&lt;/b&gt; \\[a\\](javascript:alert(1)) # and a heading" in document
+    )
+    assert footnotes(document)["docs_a_b-c"] == "second \\[^docs_a-b_c\\]"
+
+
+def test_two_cells_never_share_a_footnote_label():
+    """Joined with `-`, cells `a-b/c` and `a/b-c` would both be labelled `docs-a-b-c`."""
+    labels = footnotes(_hostile())
+    assert set(labels) == {"docs_a-b_c", "docs_a_b-c"}
+    assert labels["docs_a-b_c"].startswith("first ")

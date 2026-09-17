@@ -1,6 +1,12 @@
 # Secrets and local tooling config
 .mcp.json
 
+# Design specs and agent notes are kept locally. Named here rather than in
+# .git/info/exclude so that a build honours them too: a packaging tool reads
+# this file, and cannot see a local exclude.
+/docs/
+/CLAUDE.md
+
 # Run state. The run record at the invocation root is history and is committed.
 # Setup scratch and fixture state are regenerated on every run and are not.
 **/.witnessed/*

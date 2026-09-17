@@ -49,6 +49,28 @@ jobs:
       - run: uv sync --resolution lowest-direct
       - run: uv run --no-sync pytest -q
 
+  # What a release would carry. The sdist is built from a checkout, so anything
+  # it holds that the commit does not is a file the build invented.
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+      - run: uv build --out-dir dist
+      - name: Every packaged file is tracked in this commit
+        run: |
+          tar tzf dist/*.tar.gz \
+            | sed -e 's|^witnessed-[^/]*/||' -e '/\/$/d' -e '/^PKG-INFO$/d' -e '/^$/d' \
+            | sort -u > packaged.txt
+          git ls-files | sort -u > tracked.txt
+          if comm -23 packaged.txt tracked.txt | grep .; then
+            echo "::error::the sdist carries files this commit does not track"
+            exit 1
+          fi
+      - run: uvx twine check dist/*
+
   # The self-grids: the output formats and the quickstart, witnessed.
   grids:
     runs-on: ubuntu-latest

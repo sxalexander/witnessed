@@ -274,9 +274,17 @@ def is_gap(state: CellState) -> bool:
 
 
 def is_regression(state: CellState, record: CellRecord | None = None) -> bool:
-    """Whether a cell that was once witnessed no longer is.
+    """Whether a cell that was once witnessed no longer is, and nobody said why.
 
     A rollout row has no `last_witnessed` and a broken row does. That is the
     whole distinction between a red cell that is expected and one that is news.
+
+    An excepted cell is not news: its author wrote down, with a reason, that it
+    is closed. Counted as a regression it would fail every run thereafter under
+    the default policy, and the only escape would be deleting the axis member --
+    deleting the claim rather than closing it, which is what `except` exists to
+    avoid.
     """
+    if state is CellState.EXCEPTED:
+        return False
     return record is not None and record.last_witnessed is not None and state != CellState.WITNESSED

@@ -39,6 +39,9 @@ from witnessed.runner import DEFAULT_CONCURRENCY, DEFAULT_TIMEOUT
 
 MANIFEST_SUFFIX = ".grid.yaml"
 
+STATE_DIR_NAME = ".witnessed"
+"""The directory holding a project's records, beside the project's own root."""
+
 DEFAULT_PROMPT_TEMPLATE = "build a solution for {cell}"
 """What a gap asks for when its grid names no template.
 
@@ -124,18 +127,45 @@ def load_grids(paths: Sequence[str] | None) -> list[tuple[Grid, Path]]:
     return loaded
 
 
-def state_directory(given: str | None) -> Path:
-    """Where the records live: the flag, then the environment, then the default.
+def state_directory(given: str | None, paths: Sequence[str] | None = None) -> Path:
+    """Where the records live: the flag, then the environment, then the project.
 
     A fixture or scale run is told to write somewhere that is not a project's
     committed run file, which is the whole reason the location is a flag.
+
+    The default is the project the manifests belong to rather than the working
+    directory. Anchored to the working directory, the same grid run from a
+    subdirectory reads a second, empty memory: every cell is unknown, no cell
+    can be a regression, and `on_regression: fail` passes a run that lost
+    coverage. A `cd` must not disarm the gate.
     """
     if given:
         return Path(given).expanduser().resolve()
     from_environment = os.environ.get("WITNESSED_STATE_DIR")
     if from_environment:
         return Path(from_environment).expanduser().resolve()
-    return Path.cwd() / ".witnessed"
+    return _project_of(paths) / STATE_DIR_NAME
+
+
+def _project_of(paths: Sequence[str] | None) -> Path:
+    """The directory the records of these manifests belong to.
+
+    Found by walking up from the manifests to the first directory that already
+    holds records, or failing that to the root of the project holding them. A
+    tree with neither is its own project, which is what a grid beside a corpus
+    and no repository is.
+    """
+    given = [Path(path) for path in (paths or [Path.cwd()])]
+    start = Path(os.path.commonpath([path.resolve() for path in given] * 2))
+    if start.is_file():
+        start = start.parent
+    for directory in (start, *start.parents):
+        if (directory / STATE_DIR_NAME / state.RUN_FILE_NAME).is_file():
+            return directory
+    for directory in (start, *start.parents):
+        if (directory / ".git").exists() or (directory / "pyproject.toml").is_file():
+            return directory
+    return start
 
 
 def _verify(arguments: argparse.Namespace) -> int:
@@ -145,6 +175,11 @@ def _verify(arguments: argparse.Namespace) -> int:
     that a project's `addopts` cannot reach a grid run, and `-p no:python` so
     that a bare `witnessed verify` in a repository collects that repository's
     grids and not its unit tests.
+
+    `PYTEST_ADDOPTS` and `PYTEST_PLUGINS` are removed for the duration, because
+    pytest applies them whatever configuration file it was given: a `tox`, `nox`
+    or CI environment carrying `--collect-only` would otherwise turn a failing
+    gate into a run that exits 0 having verified nothing.
     """
     with tempfile.TemporaryDirectory(prefix="witnessed-session-") as scratch:
         configuration = Path(scratch) / "pytest.ini"
@@ -162,7 +197,7 @@ def _verify(arguments: argparse.Namespace) -> int:
             "--rootdir",
             str(Path.cwd()),
             "--witnessed-state-dir",
-            str(state_directory(arguments.state_dir)),
+            str(state_directory(arguments.state_dir, arguments.paths)),
             "--witnessed-concurrency",
             str(arguments.concurrency),
             "--witnessed-timeout",
@@ -175,14 +210,22 @@ def _verify(arguments: argparse.Namespace) -> int:
         for cell in arguments.cell or []:
             session += ["--witnessed-cell", cell]
         session += [str(path) for path in (arguments.paths or [Path.cwd()])]
-        return int(pytest.main(session))
+        borrowed = {
+            name: os.environ.pop(name)
+            for name in ("PYTEST_ADDOPTS", "PYTEST_PLUGINS")
+            if name in os.environ
+        }
+        try:
+            return int(pytest.main(session))
+        finally:
+            os.environ.update(borrowed)
 
 
 def _check(arguments: argparse.Namespace) -> int:
     """Render what is already known. No verifier runs."""
     try:
         grids = load_grids(arguments.paths)
-        records = state.load(state_directory(arguments.state_dir))
+        records = state.load(state_directory(arguments.state_dir, arguments.paths))
     except ValueError as exc:
         print(exc, file=sys.stderr)
         return int(pytest.ExitCode.USAGE_ERROR)
@@ -199,7 +242,7 @@ def _gap(arguments: argparse.Namespace) -> int:
     try:
         grids = load_grids(arguments.paths)
         templates = {grid.id: _template(grid, directory) for grid, directory in grids}
-        records = state.load(state_directory(arguments.state_dir))
+        records = state.load(state_directory(arguments.state_dir, arguments.paths))
     except ValueError as exc:
         print(exc, file=sys.stderr)
         return int(pytest.ExitCode.USAGE_ERROR)

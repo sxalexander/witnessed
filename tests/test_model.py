@@ -398,3 +398,16 @@ def test_a_last_witnessed_holding_a_witnessing_verdict_is_accepted():
         }
     )
     assert record.last_witnessed is not None
+
+
+def test_a_cell_closed_after_it_was_witnessed_is_not_a_regression():
+    """Counted as one, `except` would fail every run thereafter and the only escape
+    would be deleting the axis member: deleting the claim rather than closing it."""
+    record = CellRecord.model_validate(
+        {
+            "current": {"at": "2026-01-02T00:00:00Z", "result": {"ok": True}},
+            "last_witnessed": {"at": "2026-01-01T00:00:00Z", "result": {"ok": True}},
+        }
+    )
+    assert not is_regression(CellState.EXCEPTED, record)
+    assert is_regression(CellState.FAILED, record)

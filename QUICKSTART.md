@@ -9,13 +9,13 @@ no build, no test framework, and no language runtime beyond Witnessed itself.
 ## Install
 
 ```
-uv add git+https://github.com/<owner>/witnessed
+uv add git+https://github.com/sxalexander/witnessed
 ```
 
 Or, to try it without adding a dependency:
 
 ```
-uvx --from git+https://github.com/<owner>/witnessed witnessed --version
+uvx --from git+https://github.com/sxalexander/witnessed witnessed --version
 ```
 
 ## A corpus to make claims about

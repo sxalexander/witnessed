@@ -53,6 +53,13 @@ where a corpus is exported or a project is built, once, for the whole grid."""
 
 _STDERR_HEADING = "stderr:"
 
+_REAP_TIMEOUT = 5.0
+"""Seconds an interrupted run waits for a killed verifier to end.
+
+A process under SIGKILL ends at once unless it is stuck in the kernel, and an
+interrupt that hung on that case would be worse than one that reports it.
+"""
+
 
 @dataclass(frozen=True, slots=True)
 class Job:
@@ -233,21 +240,29 @@ async def _run_shell(command: str, cwd: Path, timeout: float) -> _Completed:
         return _Completed(None, "", "", f"exceeded {timeout:g}s and was killed")
     except asyncio.CancelledError:
         _kill_group(process)
-        _release(process)
+        await _reap(process)
         raise
 
     return _Completed(process.returncode, _text(stdout), _text(stderr), None)
 
 
-def _release(process: asyncio.subprocess.Process) -> None:
-    """Close the pipes of a killed process while the loop that owns them still runs.
+async def _reap(process: asyncio.subprocess.Process) -> None:
+    """Collect a killed process, and its pipes, before the loop that owns them ends.
 
-    A cancelled run cannot await anything, so the transport is closed here
-    instead. Left to the garbage collector, it is closed after the loop is gone
-    and reports `RuntimeError: Event loop is closed` from a destructor, where it
-    reads as a crash in Witnessed rather than as the interrupt the reader asked
-    for.
+    Awaiting inside a cancelled task is what makes this possible: the
+    cancellation has already been delivered, so cleanup may await once more
+    before re-raising it. The wait is bounded because a process that has been
+    sent SIGKILL either ends or is unkillable, and a run being interrupted must
+    not hang on the second case.
+
+    Left to the garbage collector instead, the child is collected after the loop
+    is gone: the destructors then report a still-running subprocess and a closed
+    event loop, which reach a reader who pressed Ctrl-C as though Witnessed had
+    crashed.
     """
+    with contextlib.suppress(BaseException):
+        async with asyncio.timeout(_REAP_TIMEOUT):
+            await process.wait()
     transport = getattr(process, "_transport", None)
     if transport is not None:
         with contextlib.suppress(Exception):

@@ -14,11 +14,13 @@ evidence for the rest. And the file is replaced by rename, so an interrupted
 run leaves the previous file whole rather than truncated.
 """
 
+import contextlib
+import fcntl
 import json
 import os
 import subprocess
 import tempfile
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Iterator, Mapping
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal
@@ -36,6 +38,9 @@ from witnessed.model import (
 
 RUN_FILE_NAME = "runs.json"
 """The one file inside the state directory. `--state-dir` names the directory."""
+
+LOCK_FILE_NAME = ".lock"
+"""What `held` locks. Regenerated on demand and never read, so it is not committed."""
 
 Coordinate = tuple[str, str]
 """A cell addressed as its axes yield it, which is what `Grid.cells()` produces."""
@@ -81,7 +86,11 @@ def load(state_dir: Path | str) -> RunData:
     path = run_file_path(state_dir)
     if not path.exists():
         return {}
-    text = path.read_text(encoding="utf-8")
+    try:
+        text = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as exc:
+        detail = getattr(exc, "strerror", None) or exc
+        raise ValueError(f"{path} could not be read: {detail}") from exc
     try:
         return RunFile.model_validate_json(text).grids
     except ValidationError as exc:
@@ -95,6 +104,30 @@ def load(state_dir: Path | str) -> RunData:
             for error in exc.errors()[:5]
         )
         raise ValueError(f"{path} is not a valid run file:\n{problems}") from exc
+
+
+@contextlib.contextmanager
+def held(state_dir: Path | str) -> Iterator[None]:
+    """Hold the state directory for one load-modify-save cycle.
+
+    `save` is atomic, but the cycle around it is not: a run loads the records,
+    merges its own observations into them, and writes the result. Two runs that
+    load the same records leave only the second run's merge, and the first
+    run's cells are not stale but absent -- a cell that was proven can then
+    never be recognised as a regression. Concurrent runs are ordinary here: one
+    grid per agent, several agents, one project.
+
+    The lock is advisory and POSIX, which is the same assumption the runner
+    already makes in signalling a process group.
+    """
+    directory = Path(state_dir)
+    directory.mkdir(parents=True, exist_ok=True)
+    with open(directory / LOCK_FILE_NAME, "w", encoding="utf-8") as handle:
+        fcntl.flock(handle, fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(handle, fcntl.LOCK_UN)
 
 
 def merge(

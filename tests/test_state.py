@@ -7,6 +7,8 @@ test and constructing a `CellRecord` directly bypasses it.
 
 import os
 import subprocess
+import sys
+import time
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -288,4 +290,49 @@ def test_a_conflicted_file_names_the_conflict(tmp_path: Path):
 def test_an_invalid_file_names_what_is_wrong_without_a_traceback_frame(tmp_path: Path):
     state.run_file_path(tmp_path).write_text('{"grids": {}}')
     with pytest.raises(ValueError, match=r"is not a valid run file:\n  witnessed: Field required"):
+        state.load(tmp_path)
+
+
+CYCLE = """\
+import sys, time
+from witnessed import state
+from witnessed.model import Verdict
+
+directory, grid_id, pause = sys.argv[1], sys.argv[2], float(sys.argv[3])
+with state.held(directory):
+    records = state.load(directory)
+    time.sleep(pause)
+    records = state.merge(records, grid_id, {("d", "v"): Verdict(ok=True)})
+    state.save(directory, records)
+"""
+
+
+def test_two_runs_cannot_drop_each_other_s_records(tmp_path: Path):
+    """`save` is atomic; the cycle around it must be too, or one run's proof vanishes."""
+    script = tmp_path / "cycle.py"
+    script.write_text(CYCLE)
+    slow = subprocess.Popen([sys.executable, str(script), str(tmp_path), "alpha", "1.0"])
+    time.sleep(0.2)
+    quick = subprocess.Popen([sys.executable, str(script), str(tmp_path), "beta", "0"])
+    assert slow.wait(timeout=30) == 0
+    assert quick.wait(timeout=30) == 0
+
+    records = state.load(tmp_path)
+    assert sorted(records) == ["alpha", "beta"]
+
+
+def test_an_unreadable_file_names_the_path_rather_than_raising_oserror(tmp_path: Path):
+    path = state.run_file_path(tmp_path)
+    path.write_bytes(b'{"witnessed": 1, "grids": {}}')
+    path.chmod(0o000)
+    try:
+        with pytest.raises(ValueError, match=r"runs\.json could not be read"):
+            state.load(tmp_path)
+    finally:
+        path.chmod(0o644)
+
+
+def test_a_file_that_is_not_utf8_names_the_path(tmp_path: Path):
+    state.run_file_path(tmp_path).write_bytes(b'{"witnessed": 1, "grids": {"d\xff": {}}}')
+    with pytest.raises(ValueError, match=r"runs\.json could not be read"):
         state.load(tmp_path)

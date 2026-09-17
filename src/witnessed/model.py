@@ -112,6 +112,20 @@ class CellRecord(BaseModel):
     current: Observation
     last_witnessed: Observation | None = None
 
+    @model_validator(mode="after")
+    def _last_witnessed_actually_witnessed(self) -> "CellRecord":
+        """A prior observation that did not witness the cell is not evidence of one.
+
+        Nothing in this package writes such a record, so one can only arrive by
+        hand or from another tool. Loaded rather than refused, it reports a
+        regression naming a revision at which the verifier said the cell was not
+        ok, and under the default policy that fails a build on invented evidence.
+        """
+        prior = self.last_witnessed
+        if prior is not None and not (isinstance(prior.result, Verdict) and prior.result.ok):
+            raise ValueError("`last_witnessed` must hold a verdict with `ok: true`")
+        return self
+
 
 class Policy(BaseModel):
     """What a grid's red cells cost.

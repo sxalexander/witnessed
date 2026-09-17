@@ -6,11 +6,28 @@ readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.11"
+authors = [{ name = "Sam Alexander" }]
+keywords = ["coverage", "pytest", "verification", "traceability", "matrix"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: Pytest",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: Quality Assurance",
+    "Typing :: Typed",
+]
 dependencies = [
     "pydantic>=2.10",
     "pyyaml>=6.0.2",
     "pytest>=8.4",
 ]
+
+[project.urls]
+Homepage = "https://github.com/sxalexander/witnessed"
+Quickstart = "https://github.com/sxalexander/witnessed/blob/main/QUICKSTART.md"
+Issues = "https://github.com/sxalexander/witnessed/issues"
+Security = "https://github.com/sxalexander/witnessed/blob/main/SECURITY.md"
 
 [project.scripts]
 witnessed = "witnessed.cli:main"

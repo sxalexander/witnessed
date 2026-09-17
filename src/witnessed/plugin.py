@@ -446,13 +446,22 @@ class WitnessedRunner:
     def _record(self) -> state.RunData:
         """Merge this run's observations into the run file, and replace it atomically.
 
+        The whole cycle is held: another run that loaded these records before
+        this one saved would otherwise drop every cell this run proved.
+
         A grid whose whole product was in the session declares that product, so
         a record whose coordinate the manifest no longer describes is dropped.
         A partial run declares nothing: it has no standing to retire a record
         for a cell it did not run.
         """
         directory = state_dir(self.config)
-        records = state.load(directory)
+        with state.held(directory):
+            records = self._merged(state.load(directory))
+            state.save(directory, records)
+        return records
+
+    def _merged(self, records: state.RunData) -> state.RunData:
+        """This run's observations merged into the records it found."""
         rev = state.git_rev()
 
         for grid_id, run in self.grids.items():
@@ -475,8 +484,6 @@ class WitnessedRunner:
                 rev,
                 product=run.grid.cells() if set(observed) == expected else None,
             )
-
-        state.save(directory, records)
         return records
 
     def _breached(self, records: state.RunData) -> bool:

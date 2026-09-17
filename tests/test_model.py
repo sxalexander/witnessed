@@ -381,3 +381,20 @@ def test_a_cell_is_spelled_the_same_everywhere():
         **{"except": {cell_key("button", "vue"): {"why": "unimplemented", "reason": "r"}}}
     )
     assert cell_key("button", "vue") in closed.except_
+
+
+def test_a_last_witnessed_that_did_not_witness_is_refused():
+    """A record cannot carry evidence of a green the verifier never reported."""
+    moment = {"at": "2026-01-01T00:00:00Z", "result": {"ok": False}}
+    with pytest.raises(ValidationError, match="`last_witnessed` must hold a verdict"):
+        CellRecord.model_validate({"current": moment, "last_witnessed": moment})
+
+
+def test_a_last_witnessed_holding_a_witnessing_verdict_is_accepted():
+    record = CellRecord.model_validate(
+        {
+            "current": {"at": "2026-01-02T00:00:00Z", "result": {"ok": False}},
+            "last_witnessed": {"at": "2026-01-01T00:00:00Z", "result": {"ok": True}},
+        }
+    )
+    assert record.last_witnessed is not None

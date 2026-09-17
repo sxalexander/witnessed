@@ -26,5 +26,8 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/witnessed"]
 
+[tool.pytest.ini_options]
+filterwarnings = ["error"]
+
 [tool.ruff]
 line-length = 100

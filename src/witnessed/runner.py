@@ -233,9 +233,25 @@ async def _run_shell(command: str, cwd: Path, timeout: float) -> _Completed:
         return _Completed(None, "", "", f"exceeded {timeout:g}s and was killed")
     except asyncio.CancelledError:
         _kill_group(process)
+        _release(process)
         raise
 
     return _Completed(process.returncode, _text(stdout), _text(stderr), None)
+
+
+def _release(process: asyncio.subprocess.Process) -> None:
+    """Close the pipes of a killed process while the loop that owns them still runs.
+
+    A cancelled run cannot await anything, so the transport is closed here
+    instead. Left to the garbage collector, it is closed after the loop is gone
+    and reports `RuntimeError: Event loop is closed` from a destructor, where it
+    reads as a crash in Witnessed rather than as the interrupt the reader asked
+    for.
+    """
+    transport = getattr(process, "_transport", None)
+    if transport is not None:
+        with contextlib.suppress(Exception):
+            transport.close()
 
 
 def _kill_group(process: asyncio.subprocess.Process) -> None:

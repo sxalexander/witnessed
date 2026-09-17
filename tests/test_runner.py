@@ -1,6 +1,7 @@
 """The runner's process lifecycle, observed through real subprocesses."""
 
 import asyncio
+import gc
 import os
 import time
 
@@ -27,7 +28,13 @@ def _gone_within(pid: int, seconds: float) -> bool:
 
 
 def test_a_cancelled_run_kills_the_verifier_it_started(tmp_path):
-    """An interrupt never reaches a verifier in its own session, so cancellation must kill it."""
+    """An interrupt never reaches a verifier in its own session, so cancellation must kill it.
+
+    The collection is explicit: a transport left for the garbage collector is
+    closed after the loop is gone, and the destructor's complaint reaches a
+    reader who pressed Ctrl-C as though Witnessed had crashed. `filterwarnings`
+    turns that complaint into a failure here.
+    """
     marker = tmp_path / "pid"
 
     async def cancel_once_started():
@@ -41,6 +48,7 @@ def test_a_cancelled_run_kills_the_verifier_it_started(tmp_path):
             await task
 
     asyncio.run(cancel_once_started())
+    gc.collect()
     assert _gone_within(int(marker.read_text()), 2.0)
 
 

@@ -206,8 +206,14 @@ def read_result(command: str, completed: _Completed) -> VerifyResult | Errored:
 async def _run_shell(command: str, cwd: Path, timeout: float) -> _Completed:
     """One command through a shell, bounded, with its whole process group killed on expiry.
 
-    `communicate()` rather than a read loop, because a verifier that fills a
-    pipe deadlocks against anything that waits for it to exit first.
+    Both pipes are drained as the command runs, because a verifier that fills a
+    pipe deadlocks against anything that waits for it to exit first, and because
+    what it printed before a timeout is evidence rather than noise.
+
+    A timeout does not always mean the verifier overran. A command that leaves
+    something running in the background exits at once and its descendant holds
+    the pipes open; the shell's own exit status and the verdict already read are
+    what separate that from a verifier that never answered.
 
     The command runs in its own session, so an interrupt at the terminal never
     reaches it. A cancelled run therefore kills the group itself before the
@@ -230,20 +236,54 @@ async def _run_shell(command: str, cwd: Path, timeout: float) -> _Completed:
     except (OSError, ValueError) as exc:
         return _Completed(None, "", "", f"could not be started: {exc}")
 
+    printed: dict[str, list[bytes]] = {"stdout": [], "stderr": []}
+    readers = (
+        asyncio.create_task(_drain(process.stdout, printed["stdout"])),
+        asyncio.create_task(_drain(process.stderr, printed["stderr"])),
+    )
     try:
         async with asyncio.timeout(timeout):
-            stdout, stderr = await process.communicate()
+            await asyncio.gather(*readers)
+            await process.wait()
     except TimeoutError:
         _kill_group(process)
-        with contextlib.suppress(Exception):
-            await process.wait()
+        for reader in readers:
+            reader.cancel()
+        await _reap(process)
+        if process.returncode == 0 and _last_line(_joined(printed["stdout"])) is not None:
+            return _Completed(0, _joined(printed["stdout"]), _joined(printed["stderr"]), None)
         return _Completed(None, "", "", f"exceeded {timeout:g}s and was killed")
     except asyncio.CancelledError:
         _kill_group(process)
+        for reader in readers:
+            reader.cancel()
         await _reap(process)
         raise
 
-    return _Completed(process.returncode, _text(stdout), _text(stderr), None)
+    return _Completed(
+        process.returncode, _joined(printed["stdout"]), _joined(printed["stderr"]), None
+    )
+
+
+async def _drain(stream: asyncio.StreamReader | None, into: list[bytes]) -> None:
+    """Read one pipe to its end, keeping what arrived where the caller can reach it.
+
+    Reading rather than `communicate()`, because `communicate()` accumulates
+    inside a task of its own: cancelled at a timeout, everything the verifier
+    printed is lost with it. A verifier that answered its cell and then left
+    something in the background holds the pipe open without having failed, and
+    its verdict is exactly what must survive.
+
+    Chunked rather than by line, because a pipe nobody empties fills, and a
+    verifier blocked on a full pipe never exits.
+    """
+    if stream is None:
+        return
+    while True:
+        chunk = await stream.read(65536)
+        if not chunk:
+            return
+        into.append(chunk)
 
 
 async def _reap(process: asyncio.subprocess.Process) -> None:
@@ -273,11 +313,14 @@ def _kill_group(process: asyncio.subprocess.Process) -> None:
     """Kill the shell and everything it started.
 
     The process held here is the shell, so signalling it alone leaves the
-    verifier it spawned running. The command was started in its own session,
-    which is what makes the group safe to signal as a whole.
+    verifier it spawned running. The command was started in its own session, so
+    its group id is its process id, and the group is signalled by that pid
+    directly: asking the system for the group instead fails once the shell has
+    been reaped, which is precisely the case where a descendant is the only
+    thing still holding the pipes -- and then nothing was killed at all.
     """
     try:
-        os.killpg(os.getpgid(process.pid), signal.SIGKILL)
+        os.killpg(process.pid, signal.SIGKILL)
     except (ProcessLookupError, PermissionError, OSError):
         with contextlib.suppress(ProcessLookupError, OSError):
             process.kill()
@@ -290,8 +333,8 @@ def _last_line(stdout: str) -> str | None:
     return None
 
 
-def _text(raw: bytes | None) -> str:
-    return "" if raw is None else raw.decode("utf-8", errors="replace")
+def _joined(chunks: list[bytes]) -> str:
+    return b"".join(chunks).decode("utf-8", errors="replace")
 
 
 def _output(completed: _Completed) -> str:
